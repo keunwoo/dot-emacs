@@ -73,6 +73,9 @@
                   '((width . 80) (height . 50))))
     ; (set-default-font "-*-courier-medium-r-normal-*-*-120-*-*-*-*-*-*")
     ; (set-background-color "aliceblue")
+
+    ;; Startup editor server.
+    (server-start)
     ))
 
 ; Save faces with all other options
