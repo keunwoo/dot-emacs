@@ -110,6 +110,9 @@
 ; modes, and happens to be the same keystroke used to view TeX output
 (define-key global-map "\C-c\C-v" 'compile)
 
+; ibuffer >> the regular buffer list.
+(define-key global-map "\C-x\C-b" 'ibuffer)
+
 ;; find-file provides functions to switch between spec and body
 ;; (useful in Ada and C++, which languages define specifications and
 ;; bodies of packages in separate files).
