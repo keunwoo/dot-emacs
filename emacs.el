@@ -142,6 +142,24 @@
                             ))
             (define-key global-map "\C-co" 'ff-find-other-file)))))
 
+;; Minibuffer hacks for FSF Emacs
+(if (not (string-match "XEmacs" emacs-version))
+    (progn
+
+      ;; Tab-completion in minibuffer (thanks to Ami Fischman)
+      (defadvice read-from-minibuffer
+        (around tab-is-pcomplete-in-minibuffer activate)
+        "Bind TAB to pcomplete in minibuffer reads."
+        (let ((keymap minibuffer-local-map))
+          (define-key keymap "\t" 'pcomplete)
+          (ad-set-arg 2 keymap)
+          ad-do-it))
+
+      ;; Enable recursive minibuffers
+      (set-variable 'enable-recursive-minibuffers 't)
+
+      ))
+
 ; man page lookup (by default, f1 is help, but I already know how to
 ; bring that up using C-h)
 (define-key global-map [f1]
