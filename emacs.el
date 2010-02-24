@@ -73,6 +73,9 @@
                   '((width . 80) (height . 50))))
     ; (set-default-font "-*-courier-medium-r-normal-*-*-120-*-*-*-*-*-*")
     ; (set-background-color "aliceblue")
+
+    ;; Startup editor server.
+    (server-start)
     ))
 
 ; Save faces with all other options
@@ -593,6 +596,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(c-basic-offset 4 t)
  '(column-number-mode t)
  '(delete-key-deletes-forward t t)
+ '(font-lock-maximum-decoration (quote ((t . t) (latex-mode . 2))))
  '(gnuserv-frame t)
  '(gnuserv-visit-hook (quote (raise-frame)))
  '(inhibit-startup-screen t)
