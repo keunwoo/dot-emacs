@@ -274,6 +274,10 @@
 ;; Hook code:
 ;(add-hook 'html-mode-hook '(lambda () (column-number-mode 1)))
 
+;; ibuffer rules!
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(autoload 'ibuffer "ibuffer" "List buffers." t)
+
 ;; Text mode
 (assoc "\\.txt$" auto-mode-alist)
 (setq auto-mode-alist (cons '("\\.txt$" . paragraph-indent-text-mode)
