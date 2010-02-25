@@ -7,7 +7,7 @@
 ;; Custom load paths
 
 ;; On my personal machines
-(add-to-list 'load-path "/home/klee/cecil/vortex/Cecil/src/emacs")
+;(add-to-list 'load-path "/home/klee/cecil/vortex/Cecil/src/emacs")
 (if (string-match "XEmacs" emacs-version)
     ; XEmacs
     (add-to-list 'load-path "/home/klee/lib/xemacs")
@@ -71,6 +71,16 @@
     (setq default-frame-alist
           (append default-frame-alist
                   '((width . 80) (height . 50))))
+
+    ;; Tab-completion in minibuffer (thanks to Ami Fischman)
+    (defadvice read-from-minibuffer
+      (around tab-is-pcomplete-in-minibuffer activate)
+      "Bind TAB to pcomplete in minibuffer reads."
+      (let ((keymap minibuffer-local-map))
+        (define-key keymap "\t" 'pcomplete)
+        (ad-set-arg 2 keymap)
+        ad-do-it))
+
     ; (set-default-font "-*-courier-medium-r-normal-*-*-120-*-*-*-*-*-*")
     ; (set-background-color "aliceblue")
 
