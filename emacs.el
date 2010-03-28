@@ -183,6 +183,11 @@
 (define-key global-map [f5]
   (lambda () (interactive) (switch-to-buffer-other-window "*scratch*")))
 
+; F6 to rename buffer
+(define-key global-map [f6]
+  (lambda () (interactive) 
+    (rename-buffer (read-from-minibuffer "New buffer name: "))))
+
 ; F8 to open dired buffer of the current directory, without dotfiles
 (define-key global-map [f8]
   (lambda () (interactive) (dired-other-window (concat default-directory "[^.]*"))))
