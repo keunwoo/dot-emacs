@@ -54,9 +54,6 @@
   ;; FSF
   (global-font-lock-mode 't))
 
-;; Turn on colorization of compilation.
-(require 'compilation-colorization)
-
 ;; Who needs a 3D modeline?
 (if (string-match "XEmacs" emacs-version)
     (set-specifier modeline-shadow-thickness 0))
@@ -312,9 +309,6 @@
 
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
-
-;; ncl-mode
-(load-file "/home/build/google3/configlang/ncl/ide/ncl-mode.el")
 
 ;; js2-mode
 (autoload 'js2-mode (format "js2-emacs%d" emacs-major-version) nil t)
