@@ -6,6 +6,7 @@
 
 ;; Custom load paths
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/emacs"))
+(add-to-list 'load-path (concat (getenv "HOME") "/lib/site-emacs"))
 
 ;;;;;;;;;;;;;;;;;;;;;;; EDITING ;;;;;;;;;;;;;;;;;;;;;;;
 
