@@ -296,55 +296,16 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (autoload 'ibuffer "ibuffer" "List buffers." t)
 
-;; Text mode
+;; ;; Text mode
 (assoc "\\.txt$" auto-mode-alist)
 (setq auto-mode-alist (cons '("\\.txt$" . paragraph-indent-text-mode)
                                auto-mode-alist))
-(add-hook 'text-mode-hook
-        '(lambda ()
-           (progn
-             ; Auto fill in all text-based modes (text, parindent, etc.)
-             (auto-fill-mode 1)
 
-             ; For Parindent mode, don't give me that irritating
-             ; behavior that tries to "adaptive fill" on ordinary
-             ; indented paragraphs.
-             (if (string-equal mode-name "Parindent")
-                 (progn
-                   (make-variable-buffer-local 'adaptive-fill-regexp)
-                   (setq adaptive-fill-regexp nil))))))
-
-(define-key text-mode-map "\t"
-  '(lambda ()
-     (interactive)
-     ; In Parindent mode, do a simple tab.  Otherwise,
-     ; use the fancy tabbing mode.
-     (if (string-equal mode-name "Parindent")
-       (tab-to-tab-stop)
-       (indent-relative))
-     ))
-
-; Use XML/SGML-mode for .html files, and do not auto-fill
-(assoc "\\.html$" auto-mode-alist)
-(if (string-match "XEmacs" emacs-version)
-    ;; XEmacs way
-    (progn
-      (setq auto-mode-alist
-            (cons '("\\.html$" . xml-mode) auto-mode-alist))
-      (add-hook 'xml-mode-hook
-                '(lambda ()
-                   (auto-fill-mode nil)
-                   ;; this is useful for editing Apache Ant files
-                   (define-key xml-mode-map "\C-c\C-v" 'compile)))
-
-                '(lambda ()
-                   (auto-fill-mode nil)
-                   (define-key xml-mode-map "\C-c\C-t"
-                     '(lambda () (interactive) (html-helper-default-insert-timestamp)))))
-  ;; FSF way
-  (progn
-    (add-hook 'sgml-mode-hook
-              '(lambda () (auto-fill-mode nil)))))
+;; Do not auto-fill in SGML modes.
+(add-hook 'sgml-mode-hook
+          '(lambda ()
+             (longlines-mode)
+             (define-key sgml-mode-map "\C-c\C-v" 'compile)))
 
 ;; CSS mode
 (add-hook 'css-mode-hook
@@ -488,7 +449,8 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; itself, but whatever)
 (setq tex-dvi-view-command
       (if (eq window-system 'x)
-          "kdvi"
+          "evince"
+          ;"kdvi"
           ;"xdvi"
           "dvi2tty * | cat -s"))
 
