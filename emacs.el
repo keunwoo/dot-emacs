@@ -61,15 +61,15 @@
 ;; Or a toolbar?
 (if (string-match "XEmacs" emacs-version)
     (set-specifier default-toolbar-visible-p nil)
-  ;; FSF only has a toggle, not a "turn it off" function.
-  (tool-bar-mode))
+  ;; FSF
+  (tool-bar-mode -1))
 
 ; Or a menubar?
 (if (string-match "XEmacs" emacs-version)
     ;; XEmacs.  To re-enable: M-x set-specifier menubar-visible-p 't
     (set-specifier menubar-visible-p nil)
   ;; FSF
-  (menu-bar-mode nil))
+  (menu-bar-mode -1))
 
 ;; Or a #@&$!&@ blinking cursor?
 (if (not (string-match "XEmacs" emacs-version))
@@ -210,7 +210,7 @@
 ; F7 to rotate custom colors
 (defvar background-color-rotation
   '("white" "aliceblue" "thistle1" "lemonchiffon" "khaki" "papayawhip"
-    "honeydew" "mistyrose" "paleturquoise")
+    "honeydew" "mistyrose" "paleturquoise" "transparent")
   "List of background color names for next-background-color to rotate.")
 (defun next-background-color ()
   "Returns successive background colors named in background-color-rotation."
@@ -344,15 +344,15 @@
                    (make-variable-buffer-local 'adaptive-fill-regexp)
                    (setq adaptive-fill-regexp nil))))))
 
-(define-key text-mode-map "\t"
-  '(lambda ()
-     (interactive)
-     ; In Parindent mode, do a simple tab.  Otherwise,
-     ; use the fancy tabbing mode.
-     (if (string-equal mode-name "Parindent")
-       (tab-to-tab-stop)
-       (indent-relative))
-     ))
+;; (define-key text-mode-map "\t"
+;;   '(lambda ()
+;;      (interactive)
+;;      ; In Parindent mode, do a simple tab.  Otherwise,
+;;      ; use the fancy tabbing mode.
+;;      (if (string-equal mode-name "Parindent")
+;;        (tab-to-tab-stop)
+;;        (indent-relative))
+;;      ))
 
 ; Use XML/SGML-mode for .html files, and do not auto-fill
 ;; (assoc "\\.html$" auto-mode-alist)
@@ -547,16 +547,31 @@ Major Mode for editing ML-Yacc files." t nil)
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
+ '(elisp-cache-byte-compile-files t)
+ '(ibuffer-enable t)
+ '(ibuffer-formats (quote ((mark modified read-only " " (name 32 32 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
  '(ps-print-header-frame nil)
- '(scroll-bar-mode (quote right)))
+ '(scroll-bar-mode (quote right))
+ '(visible-cursor nil))
+
+;; Fix M-x compile.
+;(load "string")
+
+;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
+;; site-specific customizations, as follows:
+;;
+;; (provide 'site-lisp-keunwoo)
+;;
+;; The following line loads the above lib.
+(require 'site-lisp-keunwoo)
 (when window-system 
   (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
+    ;; custom-set-faces was added by Custom.
+    ;; If you edit it by hand, you could mess it up, so be careful.
+    ;; Your init file should contain only one such instance.
+    ;; If there is more than one, they won't work right.
    '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
    '(font-lock-comment-face ((nil (:foreground "goldenrod4"))))
    '(font-lock-function-name-face ((nil (:foreground "blue"))))
@@ -566,17 +581,3 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
    '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
    '(trailing-whitespace ((((class color) (background light)) (:background "gray90"))))))
-
-;; Fix M-x compile.
-;(load "string")
-
-;; When did this get dropped from the main distribution?
-(load "emacs-goodies-el/nuke-trailing-whitespace")
-
-;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
-;; site-specific customizations, as follows:
-;;
-;; (provide 'site-lisp-keunwoo)
-;;
-;; The following line loads the above lib.
-(require 'site-lisp-keunwoo)
