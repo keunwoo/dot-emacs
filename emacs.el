@@ -75,7 +75,7 @@
     ; (set-background-color "aliceblue")
 
     ;; Startup editor server.
-    (server-start)
+    ;(server-start)
     ))
 
 ; Save faces with all other options
@@ -567,6 +567,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(gnuserv-visit-hook (quote (raise-frame)))
  '(inhibit-startup-screen t)
  '(load-home-init-file t t)
+ '(longlines-wrap-follows-window-size t)
  '(progress-feedback-use-echo-area (quote t))
  '(query-user-mail-address nil)
  '(scroll-bar-mode (quote right))
