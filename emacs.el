@@ -536,9 +536,6 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; Fix M-x compile.
 ;(load "string")
 
-;; When did this get dropped from the main distribution?
-(load "emacs-goodies-el/nuke-trailing-whitespace")
-
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
 ;;
