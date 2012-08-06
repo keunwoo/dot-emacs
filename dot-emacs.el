@@ -7,6 +7,7 @@
 ;; Custom load paths
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/emacs"))
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/site-emacs"))
+(require 'site-lisp-keunwoo)
 
 ;;;;;;;;;;;;;;;;;;;;;;; EDITING ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -211,7 +212,7 @@
 ; F7 to rotate custom colors
 (defvar background-color-rotation
   '("white" "aliceblue" "thistle1" "lemonchiffon" "khaki" "papayawhip"
-    "honeydew" "mistyrose" "paleturquoise")
+    "honeydew" "mistyrose" "paleturquoise" "transparent")
   "List of background color names for next-background-color to rotate.")
 (defun next-background-color ()
   "Returns successive background colors named in background-color-rotation."
@@ -331,29 +332,6 @@
 (assoc "\\.txt$" auto-mode-alist)
 (setq auto-mode-alist (cons '("\\.txt$" . paragraph-indent-text-mode)
                                auto-mode-alist))
-(add-hook 'text-mode-hook
-        '(lambda ()
-           (progn
-             ; Auto fill in all text-based modes (text, parindent, etc.)
-             ; (auto-fill-mode 1)
-
-             ; For Parindent mode, don't give me that irritating
-             ; behavior that tries to "adaptive fill" on ordinary
-             ; indented paragraphs.
-             (if (string-equal mode-name "Parindent")
-                 (progn
-                   (make-variable-buffer-local 'adaptive-fill-regexp)
-                   (setq adaptive-fill-regexp nil))))))
-
-(define-key text-mode-map "\t"
-  '(lambda ()
-     (interactive)
-     ; In Parindent mode, do a simple tab.  Otherwise,
-     ; use the fancy tabbing mode.
-     (if (string-equal mode-name "Parindent")
-       (tab-to-tab-stop)
-       (indent-relative))
-     ))
 
 ; Use XML/SGML-mode for .html files, and do not auto-fill
 ;; (assoc "\\.html$" auto-mode-alist)
@@ -524,8 +502,7 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; itself, but whatever)
 (setq tex-dvi-view-command
       (if (eq window-system 'x)
-          "kdvi"
-          ;"xdvi"
+          "evince"
           "dvi2tty * | cat -s"))
 
 ; Sometimes, for more elaborate LaTeX files, I use make instead of
@@ -570,10 +547,6 @@ Major Mode for editing ML-Yacc files." t nil)
 
 ;; Fix M-x compile.
 ;(load "string")
-
-;; When did this get dropped from the main distribution?
-;; Anyway this is now called delete-trailing-whitespace.
-;(load "emacs-goodies-el/nuke-trailing-whitespace")
 
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
