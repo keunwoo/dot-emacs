@@ -1,21 +1,11 @@
 ;; -*- emacs-lisp -*-
-;; Keunwoo Lee's .emacs file.  I use the same .emacs file regularly on
-;; Linux FSF Emacs 21.2.1, XEmacs 21.4, and Solaris 8 FSF Emacs 21.1.1.
+;; Keunwoo Lee's .emacs file.
+;; Tuned for FSF Emacs 23.1.1.
 
 ;;;;;;;;;;;;;;;;;;;;;; PRELIMINARIES ;;;;;;;;;;;;;;;;;;;;
 
 ;; Custom load paths
-
-;; On my personal machines
-(add-to-list 'load-path "/home/klee/cecil/vortex/Cecil/src/emacs")
-(if (string-match "XEmacs" emacs-version)
-    ; XEmacs
-    (add-to-list 'load-path "/home/klee/lib/xemacs")
-  ; FSF Emacs
-  (add-to-list 'load-path "/home/klee/lib/emacs"))
-
-;; On my desktop at UW
-(add-to-list 'load-path "/homes/gws/klee/lib/emacs") ; 
+(add-to-list 'load-path "/home/keunwoo/lib/emacs")
 
 ;;;;;;;;;;;;;;;;;;;;;;; EDITING ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -33,50 +23,65 @@
 ;; time I use it.
 (autoload 'comint "comint-dynamic-complete")
 
+;; Don't echo passwords for M-x ssh (and other shell modes?)
+(add-hook 'comint-output-filter-functions 'comint-watch-for-password-prompt)
+
+;; Enable narrow-to-region
+(put 'narrow-to-region 'disabled nil)
+
+;; Enable arbitrarily many recursive minibuffer sessions
+(setq minibuffer-max-depth nil)
+
+;; I usually write in US English.
+(setq-default ispell-dictionary "american")
+(setq-default ispell-local-dictionary "american")
+;; Note: Setting ispell-local-dictionary above ought to be unnecessary.
+;; Setting ispell-dictionary should be sufficient.  However, Debian
+;; (for no good reason) fucks around with ispell.el in a way that
+;; resets ispell-dictionary to "german-new" (or whatever your system
+;; default is) every time you run M-x ispell-buffer.  I begin to share
+;; Ben Laurie's opinion of vendors.
+
 ;;;;;;;;;;;;;;;;;;;;;;; DISPLAY ;;;;;;;;;;;;;;;;;;;;;;;
 
+;; That splash screen is idiotic.
+(setq inhibit-splash-screen t)
+
+;; Turn font lock on for all modes
 (if (string-match "XEmacs" emacs-version)
-    (progn ; XEmacs stuff
-      ;; XEmacs way of turning font lock for all modes
-      (font-lock-mode)
+    ;; XEmacs
+    (font-lock-mode)
+  ;; FSF
+  (global-font-lock-mode 't))
 
-      ;; Who needs a 3D modeline?
-      (set-specifier modeline-shadow-thickness 0)
+;; Who needs a 3D modeline?
+(if (string-match "XEmacs" emacs-version)
+    (set-specifier modeline-shadow-thickness 0))
 
-      ;; Or a toolbar?
-      (set-specifier default-toolbar-visible-p nil)
+;; Or a toolbar?
+(if (string-match "XEmacs" emacs-version)
+    (set-specifier default-toolbar-visible-p nil)
+  ;; FSF only has a toggle, not a "turn it off" function.
+  (tool-bar-mode))
 
-      ;; I know what I'm doing w.r.t. key mappings; don't warn me.
-      (setq display-warning-suppressed-classes
-            (cons 'key-mapping display-warning-suppressed-classes))
+; Or a menubar?
+(if (string-match "XEmacs" emacs-version)
+    ;; XEmacs.  To re-enable: M-x set-specifier menubar-visible-p 't
+    (set-specifier menubar-visible-p nil)
+  ;; FSF
+  (menu-bar-mode nil))
 
-      ;; Start gnuserv (enables inverse search in KDVI)
-      ;;(gnuserv-start)
+;; Or a #@&$!&@ blinking cursor?
+(if (not (string-match "XEmacs" emacs-version))
+    (blink-cursor-mode nil))
 
-      )
-      
-  (progn ; FSF Emacs stuff
-    ;; FSF Emacs's way of turning on font lock for all modes.
-    (global-font-lock-mode 't)
+;; I know what I'm doing w.r.t. key mappings; don't warn me.
+(if (string-match "XEmacs" emacs-version)
+    (setq display-warning-suppressed-classes
+          (cons 'key-mapping display-warning-suppressed-classes)))
 
-    ;; Turn off FSF Emacs toolbar
-    (if (boundp 'tool-bar-mode) (tool-bar-mode nil))
-
-    ;; Blinking cursor is spawn of the Evil One
-    (blink-cursor-mode nil)
-
-    ;; Set default font & other window properties under FSF Emacs.
-    ;; XEmacs doesn't need this because it uses the X resources
-    ;; database, which can be modified in ~/.Xdefaults
-    (setq default-frame-alist
-          (append default-frame-alist
-                  '((width . 80) (height . 50))))
-    ; (set-default-font "-*-courier-medium-r-normal-*-*-120-*-*-*-*-*-*")
-    ; (set-background-color "aliceblue")
-
-    ;; Startup editor server.
-    ;(server-start)
-    ))
+;; Start gnuserv (enables inverse search in KDVI)
+;;(gnuserv-start)
 
 ; Save faces with all other options
 (setq options-save-faces t)
@@ -88,13 +93,26 @@
 (line-number-mode 1) 
 (column-number-mode 1)
 
-; Get rid of the damn menu.  If I want it back, I can always invoke
-; M-x set-specifier menubar-visible-p 't
-(if (string-match "XEmacs" emacs-version)
-    (set-specifier menubar-visible-p nil)
-  ;; FSF way of doing the same; to undo, do M-x menu-bar-mode
-  (menu-bar-mode nil))
+;(require 'column-marker)
+(add-hook 'java-mode-hook
+          '(lambda ()
+             (font-lock-set-up-width-warning 100)
+             (c-set-offset 'arglist-intro '++)
+             (c-set-offset 'arglist-cont 0)
+             (c-set-offset 'arglist-cont-nonempty '++)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CLIPBOARD
+
+;; On rare occasions when I use the menu bar, I don't need the edit
+;; menu to duplicate yank/kill; use X11 clipboard instead.
+(menu-bar-enable-clipboard)
+
+;; C-y does ordinary yank, so bind Ctrl-insert, Shift-insert, and
+;; Shift-delete to copy, paste, and cut from X11 clipboard.
+(define-key global-map [S-insert] 'clipboard-yank)
+(define-key global-map [C-insert] 'clipboard-kill-ring-save)
+(define-key global-map [S-delete] 'clipboard-kill-region)
 
 ;;;;;;;;;;;;;;;;;;;;;;; KEY MAPS ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -109,6 +127,7 @@
 ; Convenient compilation macro; this key combo is used on very few
 ; modes, and happens to be the same keystroke used to view TeX output
 (define-key global-map "\C-c\C-v" 'compile)
+(define-key global-map "\C-c\C-m" 'compile)
 
 ;; find-file provides functions to switch between spec and body
 ;; (useful in Ada and C++, which languages define specifications and
@@ -179,13 +198,43 @@
 (define-key global-map [f5]
   (lambda () (interactive) (switch-to-buffer-other-window "*scratch*")))
 
+; F6 to rename the current buffer 
+(define-key global-map [f6]
+  (lambda () (interactive)
+    (rename-buffer
+     (read-from-minibuffer
+      "Rename current buffer: " ; Prompt in minibuffer
+      (buffer-name)             ; Use current name initially
+      ))))
+
+; F7 to rotate custom colors
+(defvar background-color-rotation
+  '("white" "aliceblue" "thistle1" "lemonchiffon" "khaki" "papayawhip"
+    "honeydew" "mistyrose" "paleturquoise")
+  "List of background color names for next-background-color to rotate.")
+(defun next-background-color ()
+  "Returns successive background colors named in background-color-rotation."
+  (set-variable 'background-color-rotation
+                (append (cdr background-color-rotation)
+                        (list (car background-color-rotation))))
+  (car background-color-rotation))
+(defun rotate-background-color ()
+  "Sets current background to next background color>"
+  (set-face-background 'default (next-background-color)))
+(define-key global-map [f7]
+  (lambda () (interactive) (rotate-background-color)))
+
 ; F8 to open dired buffer of the current directory, without dotfiles
 (define-key global-map [f8]
-  (lambda () (interactive) (dired-other-window (concat default-directory "[^.]*"))))
+  (lambda () (interactive)
+    (dired-other-window (concat default-directory "[^.]*"))))
 
 ; F9 to kill buffer
 (define-key global-map [f9]
   (lambda () (interactive) (kill-buffer (current-buffer))))
+
+; ibuffer is better than the normal buffer list.
+(define-key global-map "\C-x\C-b" 'ibuffer)
 
 ; PrntScrn to invoke ps-print and generate an output PostScript file.
 ;(require 'ps-print)
@@ -229,59 +278,44 @@
 ;; actually, this has the side benefit that if I accidentally hit
 ;; alt-k for some k that I never use, it's probably an accident, and
 ;; nothing will happen.
-(cond
- ((string-match "XEmacs" emacs-version)
-  (progn
-    (define-key global-map '(alt a) 'backward-sentence)
-    (define-key global-map '(alt b) 'backward-word)
-    (define-key global-map '(alt c) 'capitalize-region-or-word)
-    (define-key global-map '(alt d) 'kill-word)
-    (define-key global-map '(alt e) 'forward-sentence)
-    (define-key global-map '(alt f) 'forward-word)
-    (define-key global-map '(alt l) 'downcase-region-or-word)
-    (define-key global-map '(alt n) (lambda () (interactive) (scroll-up 1)))
-    (define-key global-map '(alt p) (lambda () (interactive) (scroll-down 1)))
-    (define-key global-map '(alt q) 'fill-paragraph-or-region)
-    (define-key global-map '(alt t) 'transpose-words)
-    (define-key global-map '(alt u) 'upcase-region-or-word)
-    (define-key global-map '(alt v) 'scroll-down-command)
-    (define-key global-map '(alt w) 'kill-ring-save)
-    (define-key global-map '(alt y) 'yank-pop)
-    (define-key global-map '(alt x) 'execute-extended-command)
-    (define-key global-map '(alt y) 'yank-pop)
-    (define-key global-map '(alt !) 'shell-command)
-    (define-key global-map '(alt <) 'beginning-of-buffer)
-    (define-key global-map '(alt >) 'end-of-buffer)
-    (define-key global-map '(alt {) 'backward-paragraph)
-    (define-key global-map '(alt }) 'forward-paragraph)
-    (define-key global-map '(alt ~) 'not-modified)))
- (t
-  (progn
-    (define-key global-map [?\A-a] 'backward-sentence)
-    (define-key global-map [?\A-b] 'backward-word)
-    (define-key global-map [?\A-c] 'capitalize-word)
-    (define-key global-map [?\A-d] 'kill-word)
-    (define-key global-map [?\A-e] 'forward-sentence)
-    (define-key global-map [?\A-f] 'forward-word)
-    (define-key global-map [?\A-l] 'downcase-word)
-    (define-key global-map [?\A-n] (lambda () (interactive) (scroll-up 1)))
-    (define-key global-map [?\A-p] (lambda () (interactive) (scroll-down 1)))
-    (define-key global-map [?\A-q] 'fill-paragraph)
-    (define-key global-map [?\A-t] 'transpose-words)
-    (define-key global-map [?\A-u] 'upcase-word)
-    (define-key global-map [?\A-v] 'scroll-down)
-    (define-key global-map [?\A-w] 'kill-ring-save)
-    (define-key global-map [?\A-y] 'yank-pop)
-    (define-key global-map [?\A-x] 'execute-extended-command)
-    (define-key global-map [?\A-!] 'shell-command)
-    (define-key global-map [?\A-<] 'beginning-of-buffer)
-    (define-key global-map [?\A->] 'end-of-buffer)
-    (define-key global-map [?\A-{] 'backward-paragraph)
-    (define-key global-map [?\A-}] 'forward-paragraph)
-    (define-key global-map [?\A-~] 'not-modified))))
-
+(define-key global-map [(alt a)] 'backward-sentence)
+(define-key global-map [(alt b)] 'backward-word)
+(define-key global-map [(alt c)] 'capitalize-word)
+(define-key global-map [(alt d)] 'kill-word)
+(define-key global-map [(alt e)] 'forward-sentence)
+(define-key global-map [(alt f)] 'forward-word)
+(define-key global-map [(alt l)] 'downcase-word)
+(define-key global-map [(alt n)] (lambda () (interactive) (scroll-up 1)))
+(define-key global-map [(alt p)] (lambda () (interactive) (scroll-down 1)))
+(define-key global-map [(alt q)] 'fill-paragraph-or-region)
+(define-key global-map [(alt t)] 'transpose-words)
+(define-key global-map [(alt u)] 'upcase-word)
+(define-key global-map [(alt v)] 'scroll-down-command)
+(define-key global-map [(alt w)] 'kill-ring-save)
+(define-key global-map [(alt y)] 'yank-pop)
+(define-key global-map [(alt x)] 'execute-extended-command)
+(define-key global-map [(alt y)] 'yank-pop)
+(define-key global-map [(alt !)] 'shell-command)
+(define-key global-map [(alt <)] 'beginning-of-buffer)
+(define-key global-map [(alt >)] 'end-of-buffer)
+(define-key global-map [(alt {)] 'backward-paragraph)
+(define-key global-map [(alt })] 'forward-paragraph)
+(define-key global-map [(alt ~)] 'not-modified)
 
 ;;;;;;;;;;;;;;;;;;;;;;; MODE HOOKS ETC ;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Mode for soft wrap.
+(require 'longlines)
+
+;; todoo-mode is terrible.
+(add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
+
+;; js2-mode
+(autoload 'js2-mode (format "js2-emacs%d" emacs-major-version) nil t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+;; use java-mode for editing JSON (it's good enough, and js2 is too finicky)
+(add-to-list 'auto-mode-alist '("\\.json$" . java-mode))
 
 ;; MODE HOOKS TEMPLATE
 ;;
@@ -328,12 +362,20 @@
              (font-lock-mode)
              (setq-default ruby-indent-level 4)))
 
+(add-hook 'python-mode-hook
+          '(lambda() (interactive)
+             ;; Fuck Python and your fucking "show me the Python
+             ;; version" keybinding.  That is really something I need
+             ;; on a motherfucking keybinding.  Not.
+             (local-set-key "\C-c\C-v" 'compile)))
+
 ;; SML mode
 ;;;### (autoloads (sml-yacc-mode sml-lex-mode sml-cm-mode sml-mode)
 ;;;;;;  "sml-mode" "sml-mode.el" (14918 21945))
 ;;; Generated autoloads from sml-mode.el
 
-(add-to-list (quote auto-mode-alist) (quote ("\\.s\\(ml\\|ig\\)\\'" . sml-mode)))
+(add-to-list (quote auto-mode-alist)
+             (quote ("\\.s\\(ml\\|ig\\)\\'" . sml-mode)))
 
 (autoload (quote sml-mode) "sml-mode" "\
 \\<sml-mode-map>Major mode for editing ML code.
@@ -410,17 +452,14 @@ Major Mode for editing ML-Yacc files." t nil)
         compilation-error-regexp-alist-alist))
       (compilation-build-compilation-error-regexp-alist)))
 
-;; C/C++ modes.  Q: why did I setq-default basic offset here when I
-;; also do it above?
+;; C/C++ modes.
 (add-hook 'c-mode-hook
           '(lambda ()
-             (font-lock-mode)
-             (setq-default c-basic-offset 4)))
+             (font-lock-mode)))
 (add-hook 'c++-mode-hook
           '(lambda ()
              (font-lock-mode)
-             (setq ps-print-color-p 't)
-             (setq c-basic-offset 4)))
+             (setq ps-print-color-p 't)))
 
 ; I haven't found a good editing mode for arbitrary XML.  sgml-mode
 ; appears to require DTDs or something.  I don't want or need a
@@ -468,110 +507,42 @@ Major Mode for editing ML-Yacc files." t nil)
 ; (setq-default font-lock-maximum-decoration
 ;              '((cecil-mode . 2) (c++-mode . 3) (t . 2)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; The following are "customize" settings.  Customize settings are
-;; normally set automatically, but I find that the default behaviors
-;; don't play nice when you have to use multiple Emacs versions and
-;; flavors.  So, I hand-hack them.
-
-(if (string-match "XEmacs" emacs-version)
-    (progn
-      ;; XEmacs 21.4 only
-      (if (string-match "21.4" emacs-version) 
-          (progn  
-            (set-specifier top-gutter-visible-p nil)
-            (custom-set-variables
-             '(progress-feedback-use-echo-area 't)
-             '(load-home-init-file t t)
-             '(zmacs-regions nil)
-             )))
-
-      ;; All XEmacs versions
-      (setq inhibit-startup-message t)
-      (custom-set-variables
-       '(load-home-init-file t t)
-       ))
-  (progn
-    ;; FSF Emacs settings
-    ;; nothing for now
-    ))
-
-;; Stuff that has to be set after customize runs, in order to not be
-;; heinously annoying.
-(if (string-match "XEmacs" emacs-version)
-    (progn
-      (require 'psgml-html)
-      (setq write-file-hooks '(html-helper-update-timestamp))))
-
-;; Generic Emacs (XEmacs or FSF)
-(put 'narrow-to-region 'disabled nil)
-(setq minibuffer-max-depth nil)
-
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:stipple nil :background "aliceblue" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 116 :width normal :family "schumacher-clean"))))
- '(bold ((t (:foreground "darkred" :size "12"))))
- '(bold-italic ((t (:italic nil))))
- '(dired-face-directory ((((type x pm mswindows tty) (class color)) (:foreground "blue3"))))
- '(dired-face-symlink ((((class color)) (:foreground "saddlebrown"))))
- '(font-latex-sectioning-1-face ((t (:inherit font-latex-sectioning-2-face :height 1.0))))
- '(font-latex-sectioning-2-face ((t (:inherit font-latex-sectioning-3-face))))
- '(font-latex-sectioning-3-face ((t (:inherit font-latex-sectioning-4-face))))
- '(font-lock-builtin-face ((((class color) (background light)) (:foreground "plum4"))))
- '(font-lock-comment-face ((((class color) (background light)) (:foreground "goldenrod4"))))
- '(font-lock-constant-face ((((class color) (background light)) (:foreground "green4"))))
- '(font-lock-function-name-face ((((class color) (background light)) (:foreground "brown4"))))
- '(font-lock-interface-def-face ((t (:foreground "blue"))))
- '(font-lock-keyword-face ((((class color) (background light)) (:foreground "darkmagenta"))))
- '(font-lock-module-def-face ((t (:foreground "red4"))))
- '(font-lock-reference-face ((((class color) (background light)) (:foreground "purple4"))))
- '(font-lock-string-face ((t (:foreground "purple"))))
- '(font-lock-type-def-face ((t (:foreground "blue4"))))
- '(font-lock-type-face ((t (:foreground "royalblue"))))
- '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
- '(gnus-summary-low-ancient-face ((((class color) (background light)) (:foreground "RoyalBlue"))))
- '(gnus-summary-low-read-face ((((class color) (background light)) (:foreground "DarkGreen"))))
- '(gnus-summary-low-ticked-face ((((class color) (background light)) (:foreground "firebrick"))))
- '(gnus-summary-low-unread-face ((t nil)))
- '(html-helper-bold-face ((t (:foreground "darkred"))))
- '(html-helper-italic-face ((t (:foreground "red4"))))
- '(hyper-apropos-section-heading ((t (:foreground "royalblue"))))
- '(info-node ((t (:foreground "maroon"))))
- '(info-xref ((t (:foreground "maroon"))))
- '(italic ((t (:foreground "red4" :size "12"))))
- '(jde-java-font-lock-bold-face ((t (:foreground "firebrick"))))
- '(jde-java-font-lock-italic-face ((t nil)))
- '(message-cited-text ((t nil)))
- '(message-header-contents ((t nil)))
- '(mode-line ((t (:size "12pt" :family "Clean" :foreground "Black" :background "gainsboro"))))
- '(mode-line-buffer-id ((t (:foreground "blue4" :background "gainsboro"))))
- '(modeline-mousable ((t (:foreground "firebrick" :background "gainsboro"))) t)
- '(modeline-mousable-minor-mode ((t (:foreground "green4" :background "gainsboro"))) t))
-
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(TeX-one-master "<none>")
- '(TeX-view-style (quote (("^a5$" "kdvi %d -paper a5") ("^landscape$" "kdvi %d -paper a4r -s 4") ("." "kdvi %d"))))
  '(blink-cursor-mode nil)
- '(c-basic-offset 4 t)
- '(column-number-mode t)
- '(delete-key-deletes-forward t t)
- '(font-lock-maximum-decoration (quote ((t . t) (latex-mode . 2))))
- '(gnuserv-frame t)
- '(gnuserv-visit-hook (quote (raise-frame)))
- '(inhibit-startup-screen t)
- '(load-home-init-file t t)
+ '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
- '(progress-feedback-use-echo-area (quote t))
- '(query-user-mail-address nil)
- '(scroll-bar-mode (quote right))
- '(user-mail-address (concat "klee" "@" "users.sourceforge.net"))
- '(visible-bell t)
- '(zmacs-regions nil))
+ '(ps-print-header-frame nil)
+ '(scroll-bar-mode (quote right)))
+(when window-system 
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+   '(font-lock-comment-face ((nil (:foreground "goldenrod4"))))
+   '(font-lock-function-name-face ((nil (:foreground "blue"))))
+   '(font-lock-keyword-face ((t (:foreground "maroon"))))
+   '(font-lock-string-face ((nil (:foreground "forestgreen"))))
+   '(font-lock-type-face ((t (:foreground "darkorange3"))))
+   '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
+   '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
+   '(trailing-whitespace ((((class color) (background light)) (:background "gray90"))))))
 
+;; Fix M-x compile.
+;(load "string")
+
+;; When did this get dropped from the main distribution?
+(load "emacs-goodies-el/nuke-trailing-whitespace")
+
+;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
+;; site-specific customizations, as follows:
+;;
+;; (provide 'site-lisp-keunwoo)
+;;
+;; The following line loads the above lib.
+(require 'site-lisp-keunwoo)
