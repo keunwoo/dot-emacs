@@ -519,16 +519,40 @@ Major Mode for editing ML-Yacc files." t nil)
 ; (setq-default font-lock-maximum-decoration
 ;              '((cecil-mode . 2) (c++-mode . 3) (t . 2)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; UTILITIES
+
+(defun hex-to-formatted-time (hex-string)
+  (format-time-string 
+   "%Y-%m-%d %H:%M:%S" 
+   (seconds-to-time (/ (string-to-number hex-string) 1000000.0))))
+
+;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
+;; site-specific customizations, as follows:
+;;
+;; (provide 'site-lisp-keunwoo)
+;;
+;; The following line loads the above lib.
+(require 'site-lisp-keunwoo)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CUSTOMIZE
+
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
+ '(elisp-cache-byte-compile-files t)
+ '(ibuffer-enable t)
+ '(ibuffer-formats (quote ((mark modified read-only " " (name 32 32 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
  '(ps-print-header-frame nil)
- '(scroll-bar-mode (quote right)))
+ '(scroll-bar-mode (quote right))
+ '(visible-bell t)
+ '(visible-cursor nil))
 (when window-system 
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
@@ -544,14 +568,3 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
    '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
    '(trailing-whitespace ((((class color) (background light)) (:background "gray90"))))))
-
-;; Fix M-x compile.
-;(load "string")
-
-;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
-;; site-specific customizations, as follows:
-;;
-;; (provide 'site-lisp-keunwoo)
-;;
-;; The following line loads the above lib.
-(require 'site-lisp-keunwoo)
