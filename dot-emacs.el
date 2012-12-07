@@ -292,7 +292,7 @@
 (define-key global-map [(alt q)] 'fill-paragraph-or-region)
 (define-key global-map [(alt t)] 'transpose-words)
 (define-key global-map [(alt u)] 'upcase-word)
-(define-key global-map [(alt v)] 'scroll-down-command)
+(define-key global-map [(alt v)] 'scroll-down)
 (define-key global-map [(alt w)] 'kill-ring-save)
 (define-key global-map [(alt y)] 'yank-pop)
 (define-key global-map [(alt x)] 'execute-extended-command)
@@ -303,6 +303,7 @@
 (define-key global-map [(alt {)] 'backward-paragraph)
 (define-key global-map [(alt })] 'forward-paragraph)
 (define-key global-map [(alt ~)] 'not-modified)
+(define-key global-map [(alt /)] 'dabbrev-expand)
 
 ;;;;;;;;;;;;;;;;;;;;;;; MODE HOOKS ETC ;;;;;;;;;;;;;;;;;;;;;;;
 
