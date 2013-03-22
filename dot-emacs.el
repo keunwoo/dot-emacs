@@ -63,7 +63,7 @@
 (if (string-match "XEmacs" emacs-version)
     (set-specifier default-toolbar-visible-p nil)
   ;; FSF only has a toggle, not a "turn it off" function.
-  (tool-bar-mode))
+  (tool-bar-mode -1))
 
 ; Or a menubar?
 (if (string-match "XEmacs" emacs-version)
@@ -167,13 +167,14 @@
     (progn
 
       ;; Tab-completion in minibuffer (thanks to Ami Fischman)
-      (defadvice read-from-minibuffer
-        (around tab-is-pcomplete-in-minibuffer activate)
-        "Bind TAB to pcomplete in minibuffer reads."
-        (let ((keymap minibuffer-local-map))
-          (define-key keymap "\t" 'pcomplete)
-          (ad-set-arg 2 keymap)
-          ad-do-it))
+      (if (< 24 emacs-major-version)
+          (defadvice read-from-minibuffer
+            (around tab-is-pcomplete-in-minibuffer activate)
+            "Bind TAB to pcomplete in minibuffer reads."
+            (let ((keymap minibuffer-local-map))
+              (define-key keymap "\t" 'pcomplete)
+              (ad-set-arg 2 keymap)
+              ad-do-it)))
 
       ;; Enable recursive minibuffers
       (set-variable 'enable-recursive-minibuffers 't)
@@ -315,6 +316,29 @@
 ;; js2-mode
 (autoload 'js2-mode (format "js2-emacs%d" emacs-major-version) nil t)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+;; from emacswiki:
+;; After js2 has parsed a js file, we look for jslint globals decl
+;; comment ("/* global Fred, _, Harry */") and add any symbols to a
+;; buffer-local var of acceptable global vars Note that we also
+;; support the "symbol: true" way of specifying names via a hack
+;; (remove any ":true" to make it look like a plain decl, and any
+;; ':false' are left behind so they'll effectively be ignored as you
+;; can;t have a symbol called "someName:false"
+(add-hook 'js2-post-parse-callbacks
+          (lambda ()
+            (when (> (buffer-size) 0)
+              (let ((btext (replace-regexp-in-string
+                            ": *true" " "
+                            (replace-regexp-in-string
+                             "[\n\t ]+"
+                             " "
+                             (buffer-substring-no-properties 1 (buffer-size))
+                             t t))))
+                (mapc (apply-partially 'add-to-list 'js2-additional-externs)
+                      (split-string
+                       (if (string-match "/\\* *global *\\(.*?\\) *\\*/" btext)
+                           (match-string-no-properties 1 btext) "")
+                       " *, *" t))))))
 
 ;; use java-mode for editing JSON (it's good enough, and js2 is too finicky)
 (add-to-list 'auto-mode-alist '("\\.json$" . java-mode))
@@ -331,6 +355,11 @@
 ;; Text mode
 (assoc "\\.txt$" auto-mode-alist)
 (setq auto-mode-alist (cons '("\\.txt$" . paragraph-indent-text-mode)
+                               auto-mode-alist))
+
+;; Markdown mode
+(assoc "\\.md$" auto-mode-alist)
+(setq auto-mode-alist (cons '("\\.md$" . longlines-mode)
                                auto-mode-alist))
 
 ; Use XML/SGML-mode for .html files, and do not auto-fill
@@ -539,10 +568,10 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; CUSTOMIZE
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(elisp-cache-byte-compile-files t)
  '(ibuffer-enable t)
@@ -551,9 +580,10 @@ Major Mode for editing ML-Yacc files." t nil)
  '(longlines-wrap-follows-window-size t)
  '(ps-print-header-frame nil)
  '(scroll-bar-mode (quote right))
+ '(vc-follow-symlinks nil)
  '(visible-bell t)
  '(visible-cursor nil))
-(when window-system 
+(when (and window-system (not (eq window-system 'ns)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
