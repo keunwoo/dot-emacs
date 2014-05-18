@@ -1,6 +1,6 @@
 ;; -*- emacs-lisp -*-
 ;; Keunwoo Lee's .emacs file.
-;; Tuned for FSF Emacs 23.1.1.
+;; Updated for GNU Emacs 24.3
 
 ;;;;;;;;;;;;;;;;;;;;;; PRELIMINARIES ;;;;;;;;;;;;;;;;;;;;
 
