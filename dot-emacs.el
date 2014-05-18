@@ -255,25 +255,6 @@
 (if (string-match "XEmacs" emacs-version)
     (define-key global-map '(control backspace) 'backward-kill-word))
 
-; Mouse wheel: scroll up, scroll down; hold down control to do pgup/pgdn.
-(defun wheel-scroll-up   ()   (lambda () (interactive) (scroll-up 2)))
-(defun wheel-scroll-down ()   (lambda () (interactive) (scroll-down 2)))
-(defun wheel-scroll-pgup ()   (lambda () (interactive) (scroll-up 20)))
-(defun wheel-scroll-pgdown () (lambda () (interactive) (scroll-down 20)))
-(cond
- ((string-match "XEmacs" emacs-version)
-  (progn
-    (define-key global-map 'button5 (wheel-scroll-up))
-    (define-key global-map 'button4 (wheel-scroll-down))
-    (define-key global-map '(control button5) (wheel-scroll-pgup))
-    (define-key global-map '(control button4) (wheel-scroll-pgdown))))
- (t ; FSF Emacs uses weird [bracket] keymap specifiers.
-  (progn
-    (define-key global-map [mouse-5] (wheel-scroll-up))
-    (define-key global-map [mouse-4] (wheel-scroll-down))
-    (define-key global-map [C-mouse-5] (wheel-scroll-pgup))
-    (define-key global-map [C-mouse-4] (wheel-scroll-pgdown)))))
-
 ;; Make alt behave like Meta for all the commands I use frequently.
 ;; Handy when using a single instance of Emacs simultaneously on
 ;; multiple X servers that disagree on how to treat alt/meta.  And,
