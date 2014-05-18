@@ -321,8 +321,8 @@
                            (match-string-no-properties 1 btext) "")
                        " *, *" t))))))
 
-;; use java-mode for editing JSON (it's good enough, and js2 is too finicky)
-(add-to-list 'auto-mode-alist '("\\.json$" . java-mode))
+;; use fundamental for editing JSON (it's good enough, and js2 is too finicky)
+(add-to-list 'auto-mode-alist '("\\.json$" . fundamental-mode))
 
 ;; MODE HOOKS TEMPLATE
 ;;
