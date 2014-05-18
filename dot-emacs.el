@@ -340,8 +340,8 @@
 
 ;; Markdown mode
 (assoc "\\.md$" auto-mode-alist)
-(setq auto-mode-alist (cons '("\\.md$" . longlines-mode)
-                               auto-mode-alist))
+;(setq auto-mode-alist (cons '("\\.md$" . longlines-mode)
+;                               auto-mode-alist))
 
 ; Use XML/SGML-mode for .html files, and do not auto-fill
 ;; (assoc "\\.html$" auto-mode-alist)
@@ -549,11 +549,8 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; CUSTOMIZE
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
+ '(column-number-mode t)
  '(elisp-cache-byte-compile-files t)
  '(ibuffer-enable t)
  '(ibuffer-formats (quote ((mark modified read-only " " (name 32 32 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
@@ -561,15 +558,13 @@ Major Mode for editing ML-Yacc files." t nil)
  '(longlines-wrap-follows-window-size t)
  '(ps-print-header-frame nil)
  '(scroll-bar-mode (quote right))
+ '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
  '(visible-cursor nil))
+
 (when (and window-system (not (eq window-system 'ns)))
   (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
    '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
    '(font-lock-comment-face ((nil (:foreground "goldenrod4"))))
    '(font-lock-function-name-face ((nil (:foreground "blue"))))
@@ -578,4 +573,10 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-type-face ((t (:foreground "darkorange3"))))
    '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
    '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
-   '(trailing-whitespace ((((class color) (background light)) (:background "gray90"))))))
+   '(trailing-whitespace ((((class color) (background light)) (:background "gray90")))))
+  )
+
+(when (and window-system (eq window-system 'ns))
+  (custom-set-faces
+   '(default ((t (:height 120 :family "Menlo")))))
+  )
