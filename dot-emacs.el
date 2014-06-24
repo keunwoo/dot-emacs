@@ -532,7 +532,7 @@ Major Mode for editing ML-Yacc files." t nil)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UTILITIES
 
-(defun hex-to-formatted-time (usec-hex-tring)
+(defun hex-to-formatted-time (usec-hex-string)
   (format-time-string 
    "%Y-%m-%d %H:%M:%S" 
    (seconds-to-time (/ (string-to-number hex-string) 1000000.0))))
