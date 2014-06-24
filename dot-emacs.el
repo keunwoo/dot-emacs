@@ -91,7 +91,7 @@
 (setq face-underline-p nil)
 
 ; Always show line and col no.
-(line-number-mode 1) 
+(line-number-mode 1)
 (column-number-mode 1)
 
 ;(require 'column-marker)
@@ -146,16 +146,16 @@
                           '(
                             ("\\.cc$"  (".hh" ".h"))
                             ("\\.hh$"  (".cc" ".C"))
-                            
+
                             ("\\.c$"   (".h"))
                             ("\\.h$"   (".c" ".cc" ".C" ".CC" ".cxx" ".cpp"))
-                            
+
                             ("\\.C$"   (".H"  ".hh" ".h"))
                             ("\\.H$"   (".C"  ".CC"))
-                            
+
                             ("\\.CC$"  (".HH" ".H"  ".hh" ".h"))
                             ("\\.HH$"  (".CC"))
-                            
+
                             ("\\.cxx$" (".hh" ".h"))
                             ("\\.cpp$" (".hpp" ".hh" ".h"))
                             ("\\.hpp$" (".cpp"))
@@ -200,7 +200,7 @@
 (define-key global-map [f5]
   (lambda () (interactive) (switch-to-buffer-other-window "*scratch*")))
 
-; F6 to rename the current buffer 
+; F6 to rename the current buffer
 (define-key global-map [f6]
   (lambda () (interactive)
     (rename-buffer
@@ -533,9 +533,63 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; UTILITIES
 
 (defun hex-to-formatted-time (usec-hex-string)
-  (format-time-string 
-   "%Y-%m-%d %H:%M:%S" 
+  (format-time-string
+   "%Y-%m-%d %H:%M:%S"
    (seconds-to-time (/ (string-to-number hex-string) 1000000.0))))
+
+;; Set PATH as specified in ~/.profile.
+;; TODO(keunwoo): dedupe entries in paths.
+(let*
+    ((strip
+      ;; Strips down a .profile line of the following form:
+      ;;   export PATH=foo:bar:baz  # optional comment
+      ;; or
+      ;;   PATH=foo:bar:baz  # another comment
+      ;; removing leading/trailing whitespace, and the leading
+      ;; "export" and "PATH=", to produce just
+      ;;   foo:bar:baz
+      (lambda (s)
+        (let* ((s (replace-regexp-in-string "#.*$" "" s 't 't))
+               (s (replace-regexp-in-string
+                   "^\\(export \\)?PATH=" "" s 't 't))
+               (s (replace-regexp-in-string
+                   "^[ \t\n]*\\([^ \t\n].*\\)$" "\\1" s 't nil))
+               (s (replace-regexp-in-string
+                   "^\\(.*[^ \t\n]\\)[ \t\n]*$" "\\1" s 't nil)))
+          s)))
+
+       ;; Extract "PATH=" or "export PATH=" lines from .profile.
+       (profile-paths
+        (let ((temp-buffer (generate-new-buffer "*path-grep*")))
+          (unwind-protect
+              (progn
+                (call-process "grep" nil temp-buffer nil
+                              "-E"
+                              "^(export )?PATH="
+                              (concat (getenv "HOME") "/.profile"))
+                (with-current-buffer temp-buffer
+                  (mapcar (lambda (s) (funcall strip s))
+                          (delete "" (split-string (buffer-string) "\n")))))
+            (kill-buffer temp-buffer))))
+
+       ;; Expand $HOME/foo/bar, replacing HOME with its value.
+       (profile-paths-expanded
+        (let ((home (getenv "HOME")))
+          (mapcar (lambda (line)
+                    (replace-regexp-in-string "[$]{?HOME}?" home line 't 't))
+                  profile-paths)))
+
+       (current-path (getenv "PATH")))
+
+  ;; Substitutes PATH sequentially at the appropriate part in each
+  ;; subsequent declaration.
+  (dolist (profile-path profile-paths-expanded)
+    (setq current-path
+          (replace-regexp-in-string "[$]{?PATH}?" current-path profile-path
+                                    't 't)))
+
+  ;; Return final, concatenated/expanded path.
+  (setenv "PATH" current-path))
 
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
