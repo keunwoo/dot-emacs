@@ -538,57 +538,59 @@ Major Mode for editing ML-Yacc files." t nil)
 
 ;; Set PATH as specified in ~/.profile.
 ;; TODO(keunwoo): dedupe entries in paths.
-(let*
-    ((strip
-      ;; Strips down a .profile line of the following form:
-      ;;   export PATH=foo:bar:baz  # optional comment
-      ;; or
-      ;;   PATH=foo:bar:baz  # another comment
-      ;; removing leading/trailing whitespace, and the leading
-      ;; "export" and "PATH=", to produce just
-      ;;   foo:bar:baz
-      (lambda (s)
-        (let* ((s (replace-regexp-in-string "#.*$" "" s 't 't))
-               (s (replace-regexp-in-string
-                   "^\\(export \\)?PATH=" "" s 't 't))
-               (s (replace-regexp-in-string
-                   "^[ \t\n]*\\([^ \t\n].*\\)$" "\\1" s 't nil))
-               (s (replace-regexp-in-string
-                   "^\\(.*[^ \t\n]\\)[ \t\n]*$" "\\1" s 't nil)))
-          s)))
+;; TODO(keunwoo): make this work on Windows
+(if (not (eq system-type 'windows-nt))
+    (let*
+        ((strip
+          ;; Strips down a .profile line of the following form:
+          ;;   export PATH=foo:bar:baz  # optional comment
+          ;; or
+          ;;   PATH=foo:bar:baz  # another comment
+          ;; removing leading/trailing whitespace, and the leading
+          ;; "export" and "PATH=", to produce just
+          ;;   foo:bar:baz
+          (lambda (s)
+            (let* ((s (replace-regexp-in-string "#.*$" "" s 't 't))
+                   (s (replace-regexp-in-string
+                       "^\\(export \\)?PATH=" "" s 't 't))
+                   (s (replace-regexp-in-string
+                       "^[ \t\n]*\\([^ \t\n].*\\)$" "\\1" s 't nil))
+                   (s (replace-regexp-in-string
+                       "^\\(.*[^ \t\n]\\)[ \t\n]*$" "\\1" s 't nil)))
+              s)))
 
-       ;; Extract "PATH=" or "export PATH=" lines from .profile.
-       (profile-paths
-        (let ((temp-buffer (generate-new-buffer "*path-grep*")))
-          (unwind-protect
-              (progn
-                (call-process "grep" nil temp-buffer nil
-                              "-E"
-                              "^(export )?PATH="
-                              (concat (getenv "HOME") "/.profile"))
-                (with-current-buffer temp-buffer
-                  (mapcar (lambda (s) (funcall strip s))
-                          (delete "" (split-string (buffer-string) "\n")))))
-            (kill-buffer temp-buffer))))
+         ;; Extract "PATH=" or "export PATH=" lines from .profile.
+         (profile-paths
+          (let ((temp-buffer (generate-new-buffer "*path-grep*")))
+            (unwind-protect
+                (progn
+                  (call-process "grep" nil temp-buffer nil
+                                "-E"
+                                "^(export )?PATH="
+                                (concat (getenv "HOME") "/.profile"))
+                  (with-current-buffer temp-buffer
+                    (mapcar (lambda (s) (funcall strip s))
+                            (delete "" (split-string (buffer-string) "\n")))))
+              (kill-buffer temp-buffer))))
 
-       ;; Expand $HOME/foo/bar, replacing HOME with its value.
-       (profile-paths-expanded
-        (let ((home (getenv "HOME")))
-          (mapcar (lambda (line)
-                    (replace-regexp-in-string "[$]{?HOME}?" home line 't 't))
-                  profile-paths)))
+         ;; Expand $HOME/foo/bar, replacing HOME with its value.
+         (profile-paths-expanded
+          (let ((home (getenv "HOME")))
+            (mapcar (lambda (line)
+                      (replace-regexp-in-string "[$]{?HOME}?" home line 't 't))
+                    profile-paths)))
 
-       (current-path (getenv "PATH")))
+         (current-path (getenv "PATH")))
 
-  ;; Substitutes PATH sequentially at the appropriate part in each
-  ;; subsequent declaration.
-  (dolist (profile-path profile-paths-expanded)
-    (setq current-path
-          (replace-regexp-in-string "[$]{?PATH}?" current-path profile-path
-                                    't 't)))
+      ;; Substitutes PATH sequentially at the appropriate part in each
+      ;; subsequent declaration.
+      (dolist (profile-path profile-paths-expanded)
+        (setq current-path
+              (replace-regexp-in-string "[$]{?PATH}?" current-path profile-path
+                                        't 't)))
 
-  ;; Return final, concatenated/expanded path.
-  (setenv "PATH" current-path))
+      ;; Return final, concatenated/expanded path.
+      (setenv "PATH" current-path)))
 
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
