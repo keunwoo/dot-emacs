@@ -231,9 +231,9 @@
   (lambda () (interactive)
     (dired-other-window (concat default-directory "[^.]*"))))
 
-; F9 to kill buffer
+; F9 to re-execute last compilation
 (define-key global-map [f9]
-  (lambda () (interactive) (kill-buffer (current-buffer))))
+  (lambda () (interactive) (recompile)))
 
 ; ibuffer is better than the normal buffer list.
 (define-key global-map "\C-x\C-b" 'ibuffer)
@@ -602,6 +602,10 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; CUSTOMIZE
 
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode t)
  '(elisp-cache-byte-compile-files t)
@@ -609,7 +613,9 @@ Major Mode for editing ML-Yacc files." t nil)
  '(ibuffer-formats (quote ((mark modified read-only " " (name 32 32 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
+ '(package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
  '(ps-print-header-frame nil)
+ '(safe-local-variable-values (quote ((css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
