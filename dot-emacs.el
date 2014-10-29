@@ -289,7 +289,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;; MODE HOOKS ETC ;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Mode for soft wrap.
-(require 'longlines)
+(if (or (< emacs-major-version 24)
+        (and (eq emacs-major-version 24) (< emacs-minor-version 4)))
+    (require 'longlines))
 
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
