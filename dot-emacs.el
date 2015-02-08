@@ -102,6 +102,35 @@
              (c-set-offset 'arglist-cont 0)
              (c-set-offset 'arglist-cont-nonempty '++)))
 
+;; Rotates among custom background colors
+(defvar background-color-rotation
+  '("white" "aliceblue" "thistle1" "lemonchiffon" "khaki" "papayawhip"
+    "honeydew" "mistyrose" "pale turquoise")
+  "List of background color names for next-background-color to rotate.")
+(defun next-background-color ()
+  "Returns successive background colors named in background-color-rotation."
+  (set-variable 'background-color-rotation
+                (append (cdr background-color-rotation)
+                        (list (car background-color-rotation))))
+  (car background-color-rotation))
+(defun rotate-background-color ()
+  "Sets current background to next background color>"
+  (set-face-background 'default (next-background-color)))
+
+;; Rotates among some standardized frame widths.
+(defvar frame-width-rotation
+  '(80 99 100)  ; preferred column widths for python/js/C++, rust, java
+  "List of column widths to rotate.")
+(defun next-frame-width ()
+  "Returns successive frame widths in frame-width-rotation."
+  (set-variable 'frame-width-rotation
+                (append (cdr frame-width-rotation)
+                        (list (car frame-width-rotation))))
+  (car frame-width-rotation))
+(defun rotate-frame-width ()
+  "Sets current frame width to next frame width>"
+  (set-frame-width (selected-frame) (next-frame-width)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CLIPBOARD
 
@@ -209,22 +238,9 @@
       (buffer-name)             ; Use current name initially
       ))))
 
-; F7 to rotate custom colors
-(defvar background-color-rotation
-  '("white" "aliceblue" "thistle1" "lemonchiffon" "khaki" "papayawhip"
-    "honeydew" "mistyrose" "paleturquoise" "transparent")
-  "List of background color names for next-background-color to rotate.")
-(defun next-background-color ()
-  "Returns successive background colors named in background-color-rotation."
-  (set-variable 'background-color-rotation
-                (append (cdr background-color-rotation)
-                        (list (car background-color-rotation))))
-  (car background-color-rotation))
-(defun rotate-background-color ()
-  "Sets current background to next background color>"
-  (set-face-background 'default (next-background-color)))
+;; F7 to rotate frame width.
 (define-key global-map [f7]
-  (lambda () (interactive) (rotate-background-color)))
+  (lambda () (interactive) (rotate-frame-width)))
 
 ; F8 to open dired buffer of the current directory, without dotfiles
 (define-key global-map [f8]
