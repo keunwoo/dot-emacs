@@ -135,7 +135,9 @@
 
 ;; Rotates among some standardized frame widths.
 (defvar frame-width-rotation
-  '(80 99 100)  ; preferred column widths for python/js/C++, rust, java
+  ;; preferred column widths for python/js/C++, rust, java, go
+  ;; (well, go doesn't have a recommended width, but 120 fits most code)
+  '(80 99 100 120)
   "List of column widths to rotate.")
 (defun next-frame-width ()
   "Returns successive frame widths in frame-width-rotation."
