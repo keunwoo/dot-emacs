@@ -43,6 +43,22 @@
 ;; default is) every time you run M-x ispell-buffer.  I begin to share
 ;; Ben Laurie's opinion of vendors.
 
+;; Configure helm.
+;;
+;; I assume the emacs maintainers had a good reason for making require
+;; not work during init scripts, but it seems annoying.
+(add-hook 'after-init-hook
+          (lambda()
+            (require 'helm)
+            (require 'helm-config)
+            (require 'helm-ls-git)
+            ;; (helm-mode 1)  ; Not ready for this yet
+            ;; Reset the insane default prefix.
+            (global-set-key (kbd "C-c C-h") 'helm-command-prefix)
+            (global-unset-key (kbd "C-x c"))
+            ;; Find within current repo using helm.
+            (global-set-key (kbd "C-c f") 'helm-ls-git-ls)))
+
 ;;;;;;;;;;;;;;;;;;;;;;; DISPLAY ;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; That splash screen is idiotic.
