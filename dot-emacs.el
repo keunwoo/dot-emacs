@@ -572,9 +572,12 @@ Major Mode for editing ML-Yacc files." t nil)
    "%Y-%m-%d %H:%M:%S"
    (seconds-to-time (/ (string-to-number hex-string) 1000000.0))))
 
-;; Set PATH as specified in ~/.profile.
-;; TODO(keunwoo): dedupe entries in paths.
-;; TODO(keunwoo): make this work on Windows
+;;; Extracts list of paths specified in ~/.profile.
+;;; TODO(keunwoo): dedupe entries in paths.
+;;; TODO(keunwoo): make this work on Windows
+;; XXX-TODO: extract below into function
+;; XXX-TODO: add another function that extracts paths from /etc/paths{,.d}
+;;(defun exec-path-from-profile (
 (if (not (eq system-type 'windows-nt))
     (let*
         ((strip
