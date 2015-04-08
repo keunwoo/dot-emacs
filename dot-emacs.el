@@ -139,15 +139,19 @@
   ;; (well, go doesn't have a recommended width, but 120 fits most code)
   '(80 99 100 120)
   "List of column widths to rotate.")
-(defun next-frame-width ()
-  "Returns successive frame widths in frame-width-rotation."
-  (set-variable 'frame-width-rotation
-                (append (cdr frame-width-rotation)
-                        (list (car frame-width-rotation))))
-  (car frame-width-rotation))
-(defun rotate-frame-width ()
+(defun frame-width-next (frame)
+  "Returns next width for frame in frame-width-rotation."
+  (cl-labels
+      ((helper (n alist)
+               (cond
+                ((eq alist nil)    (car frame-width-rotation))
+                ((> (car alist) n) (car alist))
+                (t                 (helper n (cdr alist))))))
+    (helper (frame-width frame) frame-width-rotation)))
+(defun frame-width-rotate ()
   "Sets current frame width to next frame width>"
-  (set-frame-width (selected-frame) (next-frame-width)))
+  (let ((f (selected-frame)))
+    (set-frame-width f (frame-width-next f))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CLIPBOARD
@@ -258,7 +262,7 @@
 
 ;; F7 to rotate frame width.
 (define-key global-map [f7]
-  (lambda () (interactive) (rotate-frame-width)))
+  (lambda () (interactive) (frame-width-rotate)))
 
 ; F8 to open dired buffer of the current directory, without dotfiles
 (define-key global-map [f8]
