@@ -48,7 +48,7 @@
 ;; I assume the emacs maintainers had a good reason for making require
 ;; not work during init scripts, but it seems annoying.
 (add-hook 'after-init-hook
-          (lambda()
+          (lambda ()
             (require 'helm)
             (require 'helm-config)
             (require 'helm-ls-git)
@@ -334,6 +334,15 @@
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
+;; Golang stuff.
+(add-hook 'after-init-hook
+          (lambda ()
+            (require 'go-mode)
+            ;; I symlink oracle.el to go-oracle.el in my local site-emacs
+            ;; dir so that 'require go-oracle works (instead of load-file).
+            (require 'go-oracle)))
+(add-hook 'before-save-hook #'gofmt-before-save)
+
 ;; js2-mode
 ;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
 (autoload 'js2-mode "js2" nil t)
@@ -403,6 +412,19 @@
 ;;     (setq auto-mode-alist
 ;;           (cons '("\\.html$" . sgml-mode) auto-mode-alist))
 ;;     (auto-fill-mode nil)))
+
+;; Use multi-web-mode for html-like files.
+(add-hook 'after-init-hook
+          (lambda ()
+            (require 'multi-web-mode)
+            (setq mweb-default-major-mode 'html-mode)
+            (setq mweb-tags
+                  '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+                    (js-mode  "<script[^>]*>" "</script>")
+                    (css-mode "<style[^>]*>" "</style>")))
+            (setq mweb-filename-extensions
+                  '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
+            (multi-web-global-mode 1)))
 
 ;; CSS mode
 (add-hook 'css-mode-hook
