@@ -655,7 +655,9 @@ Major Mode for editing ML-Yacc files." t nil)
                                         't 't)))
 
       ;; Return final, concatenated/expanded path.
-      (setenv "PATH" current-path)))
+      (setenv "PATH" current-path)
+      (set-variable 'exec-path (split-string (getenv "PATH") ":"))
+      ))
 
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
