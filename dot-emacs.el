@@ -79,7 +79,8 @@
 (if (string-match "XEmacs" emacs-version)
     (set-specifier default-toolbar-visible-p nil)
   ;; FSF only has a toggle, not a "turn it off" function.
-  (tool-bar-mode -1))
+  (if (functionp 'tool-bar-mode)
+      (tool-bar-mode -1)))
 
 ; Or a menubar?
 (if (string-match "XEmacs" emacs-version)
