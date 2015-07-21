@@ -392,40 +392,16 @@
 ;; Markdown mode
 (assoc "\\.md$" auto-mode-alist)
 
-; Use XML/SGML-mode for .html files, and do not auto-fill
-;; (assoc "\\.html$" auto-mode-alist)
-;; (if (string-match "XEmacs" emacs-version)
-;;     (progn
-;;       (setq auto-mode-alist
-;;             (cons '("\\.html$" . xml-mode) auto-mode-alist))
-;;       (add-hook 'xml-mode-hook
-;;                 '(lambda ()
-;;                    (auto-fill-mode nil)
-;;                    ;; this is useful for editing Apache Ant files
-;;                    (define-key xml-mode-map "\C-c\C-v" 'compile))
-;;                 '(lambda ()
-;;                    (auto-fill-mode nil)
-;;                    (define-key xml-mode-map "\C-c\C-t"
-;;                      '(lambda () (interactive)
-;;                         (html-helper-default-insert-timestamp))))))
-;;   ;; FSF
-;;   (progn
-;;     (setq auto-mode-alist
-;;           (cons '("\\.html$" . sgml-mode) auto-mode-alist))
-;;     (auto-fill-mode nil)))
-
-;; Use multi-web-mode for html-like files.
+;;; Use web-mode for html-like files.
 (add-hook 'after-init-hook
           (lambda ()
-            (require 'multi-web-mode)
-            (setq mweb-default-major-mode 'html-mode)
-            (setq mweb-tags
-                  '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-                    (js-mode  "<script[^>]*>" "</script>")
-                    (css-mode "<style[^>]*>" "</style>")))
-            (setq mweb-filename-extensions
-                  '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
-            (multi-web-global-mode 1)))
+            (require 'web-mode nil t)
+            (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
 
 ;; CSS mode
 (add-hook 'css-mode-hook
