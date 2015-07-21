@@ -49,9 +49,9 @@
 ;; not work during init scripts, but it seems annoying.
 (add-hook 'after-init-hook
           (lambda ()
-            (require 'helm)
-            (require 'helm-config)
-            (require 'helm-ls-git)
+            (require 'helm nil t)
+            (require 'helm-config nil t)
+            (require 'helm-ls-git nil t)
             ;; (helm-mode 1)  ; Not ready for this yet
             ;; Reset the insane default prefix.
             (global-set-key (kbd "C-c C-h") 'helm-command-prefix)
