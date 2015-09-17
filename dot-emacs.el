@@ -678,6 +678,9 @@ Major Mode for editing ML-Yacc files." t nil)
   )
 
 (when (and window-system (eq window-system 'ns))
-  (custom-set-faces
-   '(default ((t (:height 120 :family "Menlo")))))
-  )
+  (cond ((x-family-fonts "Inconsolata")
+         (custom-set-faces
+          '(default ((t (:family "Inconsolata" :height 130))))))
+        (t
+         (custom-set-faces
+          '(default ((t (:family "Menlo" :height 120))))))))
