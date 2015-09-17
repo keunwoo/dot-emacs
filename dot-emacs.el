@@ -332,13 +332,14 @@
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
 ;; Golang stuff.
+(setq gofmt-command "goimports")
 (add-hook 'after-init-hook
           (lambda ()
             (require 'go-mode nil t)
             ;; I symlink oracle.el to go-oracle.el in my local site-emacs
             ;; dir so that 'require go-oracle works (instead of load-file).
             (require 'go-oracle nil t)
-            (add-hook 'before-save-hook #'gofmt-before-save)))
+            (add-hook 'before-save-hook 'gofmt-before-save)))
 
 ;; js2-mode
 ;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
