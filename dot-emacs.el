@@ -169,16 +169,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;; KEY MAPS ;;;;;;;;;;;;;;;;;;;;;;;
 
-; Abbreviation expansion.  Not useful for me, because I use languages
-; that actually make use of the backquote.
-; (global-set-key "`" 'dabbrev-expand)
-
-; I don't know why one would set this any other way, since C-d does
-; forward delete... whatever.
+;; I don't know why one would set this any other way, since C-d does
+;; forward delete... whatever.
 (setq delete-key-deletes-forward nil)
 
-; Convenient compilation macro; this key combo is used on very few
-; modes, and happens to be the same keystroke used to view TeX output
+;; Convenient compilation macro; this key combo is used on very few
+;; modes, and happens to be the same keystroke used to view TeX output
 (define-key global-map "\C-c\C-v" 'compile)
 (define-key global-map "\C-c\C-m" 'compile)
 
