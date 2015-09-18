@@ -667,16 +667,7 @@ Major Mode for editing ML-Yacc files." t nil)
 
 (when (and window-system (not (eq window-system 'ns)))
   (custom-set-faces
-   '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
-   '(font-lock-comment-face ((nil (:foreground "goldenrod4"))))
-   '(font-lock-function-name-face ((nil (:foreground "blue"))))
-   '(font-lock-keyword-face ((t (:foreground "maroon"))))
-   '(font-lock-string-face ((nil (:foreground "forestgreen"))))
-   '(font-lock-type-face ((t (:foreground "darkorange3"))))
-   '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
-   '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
-   '(trailing-whitespace ((((class color) (background light)) (:background "gray90")))))
-  )
+   '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))
 
 (when (and window-system (eq window-system 'ns))
   (cond
@@ -694,3 +685,16 @@ Major Mode for editing ML-Yacc files." t nil)
      '(default ((t (:family "Menlo" :height 120))))))
 
    ))
+
+;; ;; A color scheme that's less obtrusive than the Emacs default.
+;; ;; Hmm, I don't like this as much as I used to...
+;; (when window-system
+;;   (custom-set-faces
+;;    '(font-lock-comment-face ((nil (:foreground "goldenrod4"))))
+;;    '(font-lock-function-name-face ((nil (:foreground "blue3"))))
+;;    '(font-lock-keyword-face ((t (:foreground "maroon"))))
+;;    '(font-lock-string-face ((nil (:foreground "forestgreen"))))
+;;    '(font-lock-type-face ((t (:foreground "darkorange3"))))
+;;    '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
+;;    '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
+;;    '(trailing-whitespace ((((class color) (background light)) (:background "gray90"))))))
