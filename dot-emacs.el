@@ -679,9 +679,18 @@ Major Mode for editing ML-Yacc files." t nil)
   )
 
 (when (and window-system (eq window-system 'ns))
-  (cond ((x-family-fonts "Inconsolata")
-         (custom-set-faces
-          '(default ((t (:family "Inconsolata" :height 130))))))
-        (t
-         (custom-set-faces
-          '(default ((t (:family "Menlo" :height 120))))))))
+  (cond
+
+   ;; ;; I was trying out Inconsolata for a while, and I might give it another
+   ;; ;; shot someday.  It's very nice, but it doesn't have a bold weight.  I
+   ;; ;; was fairly surprised that this bothered me, but it did.
+   ;; ((x-family-fonts "Inconsolata")
+   ;;  (custom-set-faces
+   ;;   '(default ((t (:family "Inconsolata" :height 130))))))
+
+   ;; ...so Menlo it is on OSX.
+   (t
+    (custom-set-faces
+     '(default ((t (:family "Menlo" :height 120))))))
+
+   ))
