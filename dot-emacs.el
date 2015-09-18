@@ -1,6 +1,6 @@
 ;; -*- emacs-lisp -*-
 ;; Keunwoo Lee's .emacs file.
-;; Updated for GNU Emacs 24.3
+;; Updated for GNU Emacs 24.5.1
 
 ;;;;;;;;;;;;;;;;;;;;;; PRELIMINARIES ;;;;;;;;;;;;;;;;;;;;
 
@@ -653,13 +653,28 @@ Major Mode for editing ML-Yacc files." t nil)
  '(column-number-mode t)
  '(elisp-cache-byte-compile-files t)
  '(ibuffer-enable t)
- '(ibuffer-formats (quote ((mark modified read-only " " (name 32 32 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
+ '(ibuffer-formats
+   (quote
+    ((mark modified read-only " "
+           (name 32 32 :left :elide)
+           " "
+           (size 9 -1 :right)
+           " "
+           (mode 16 16 :left :elide)
+           " " filename-and-process)
+     (mark " "
+           (name 16 -1)
+           " " filename))))
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
- '(package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
+ '(package-archives
+   (quote
+    (("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa" . "http://melpa.milkbox.net/packages/"))))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values (quote ((css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
+ '(show-trailing-whitespace t)
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
@@ -680,21 +695,23 @@ Major Mode for editing ML-Yacc files." t nil)
    ;;   '(default ((t (:family "Inconsolata" :height 130))))))
 
    ;; ...so Menlo it is on OSX.
+   ;; Menlo is just a tweaked version of DejaVu Sans Mono.
    (t
     (custom-set-faces
      '(default ((t (:family "Menlo" :height 120))))))
 
    ))
 
-;; ;; A color scheme that's less obtrusive than the Emacs default.
-;; ;; Hmm, I don't like this as much as I used to...
-;; (when window-system
-;;   (custom-set-faces
-;;    '(font-lock-comment-face ((nil (:foreground "goldenrod4"))))
-;;    '(font-lock-function-name-face ((nil (:foreground "blue3"))))
-;;    '(font-lock-keyword-face ((t (:foreground "maroon"))))
-;;    '(font-lock-string-face ((nil (:foreground "forestgreen"))))
-;;    '(font-lock-type-face ((t (:foreground "darkorange3"))))
-;;    '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
-;;    '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
-;;    '(trailing-whitespace ((((class color) (background light)) (:background "gray90"))))))
+;; A color scheme that's less obtrusive than the Emacs default.
+;; Guarded with window-system because many terminals render subtle colors badly.
+(when window-system
+  (custom-set-faces
+   '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
+   '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
+   '(font-lock-string-face ((t (:foreground "#338300"))))
+   '(font-lock-type-face ((t (:foreground "#aa4400"))))
+   '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
+   '(mode-line ((t (:background "#e5e5e5" :box nil))))
+   '(trailing-whitespace ((t (:background "#e5e5e5"))))
+   ))
