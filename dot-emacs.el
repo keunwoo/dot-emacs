@@ -113,7 +113,7 @@
 ;(require 'column-marker)
 (add-hook 'java-mode-hook
           '(lambda ()
-             (font-lock-set-up-width-warning 100)
+             ; (font-lock-set-up-width-warning 100)
              (c-set-offset 'arglist-intro '++)
              (c-set-offset 'arglist-cont 0)
              (c-set-offset 'arglist-cont-nonempty '++)))
