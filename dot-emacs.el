@@ -1,6 +1,6 @@
 ;; -*- emacs-lisp -*-
 ;; Keunwoo Lee's .emacs file.
-;; Updated for GNU Emacs 24.3
+;; Updated for GNU Emacs 24.5.1
 
 ;;;;;;;;;;;;;;;;;;;;;; PRELIMINARIES ;;;;;;;;;;;;;;;;;;;;
 
@@ -48,10 +48,10 @@
 ;; I assume the emacs maintainers had a good reason for making require
 ;; not work during init scripts, but it seems annoying.
 (add-hook 'after-init-hook
-          (lambda()
-            (require 'helm)
-            (require 'helm-config)
-            (require 'helm-ls-git)
+          (lambda ()
+            (require 'helm nil t)
+            (require 'helm-config nil t)
+            (require 'helm-ls-git nil t)
             ;; (helm-mode 1)  ; Not ready for this yet
             ;; Reset the insane default prefix.
             (global-set-key (kbd "C-c C-h") 'helm-command-prefix)
@@ -79,7 +79,8 @@
 (if (string-match "XEmacs" emacs-version)
     (set-specifier default-toolbar-visible-p nil)
   ;; FSF only has a toggle, not a "turn it off" function.
-  (tool-bar-mode -1))
+  (if (functionp 'tool-bar-mode)
+      (tool-bar-mode -1)))
 
 ; Or a menubar?
 (if (string-match "XEmacs" emacs-version)
@@ -168,16 +169,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;; KEY MAPS ;;;;;;;;;;;;;;;;;;;;;;;
 
-; Abbreviation expansion.  Not useful for me, because I use languages
-; that actually make use of the backquote.
-; (global-set-key "`" 'dabbrev-expand)
-
-; I don't know why one would set this any other way, since C-d does
-; forward delete... whatever.
+;; I don't know why one would set this any other way, since C-d does
+;; forward delete... whatever.
 (setq delete-key-deletes-forward nil)
 
-; Convenient compilation macro; this key combo is used on very few
-; modes, and happens to be the same keystroke used to view TeX output
+;; Convenient compilation macro; this key combo is used on very few
+;; modes, and happens to be the same keystroke used to view TeX output
 (define-key global-map "\C-c\C-v" 'compile)
 (define-key global-map "\C-c\C-m" 'compile)
 
@@ -334,6 +331,16 @@
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
+;; Golang stuff.
+(setq gofmt-command "goimports")
+(add-hook 'after-init-hook
+          (lambda ()
+            (require 'go-mode nil t)
+            ;; I symlink oracle.el to go-oracle.el in my local site-emacs
+            ;; dir so that 'require go-oracle works (instead of load-file).
+            (require 'go-oracle nil t)
+            (add-hook 'before-save-hook 'gofmt-before-save)))
+
 ;; js2-mode
 ;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
 (autoload 'js2-mode "js2" nil t)
@@ -382,27 +389,16 @@
 ;; Markdown mode
 (assoc "\\.md$" auto-mode-alist)
 
-; Use XML/SGML-mode for .html files, and do not auto-fill
-;; (assoc "\\.html$" auto-mode-alist)
-;; (if (string-match "XEmacs" emacs-version)
-;;     (progn
-;;       (setq auto-mode-alist
-;;             (cons '("\\.html$" . xml-mode) auto-mode-alist))
-;;       (add-hook 'xml-mode-hook
-;;                 '(lambda ()
-;;                    (auto-fill-mode nil)
-;;                    ;; this is useful for editing Apache Ant files
-;;                    (define-key xml-mode-map "\C-c\C-v" 'compile))
-;;                 '(lambda ()
-;;                    (auto-fill-mode nil)
-;;                    (define-key xml-mode-map "\C-c\C-t"
-;;                      '(lambda () (interactive)
-;;                         (html-helper-default-insert-timestamp))))))
-;;   ;; FSF
-;;   (progn
-;;     (setq auto-mode-alist
-;;           (cons '("\\.html$" . sgml-mode) auto-mode-alist))
-;;     (auto-fill-mode nil)))
+;;; Use web-mode for html-like files.
+(add-hook 'after-init-hook
+          (lambda ()
+            (require 'web-mode nil t)
+            (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+            (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
 
 ;; CSS mode
 (add-hook 'css-mode-hook
@@ -633,7 +629,9 @@ Major Mode for editing ML-Yacc files." t nil)
                                         't 't)))
 
       ;; Return final, concatenated/expanded path.
-      (setenv "PATH" current-path)))
+      (setenv "PATH" current-path)
+      (set-variable 'exec-path (split-string (getenv "PATH") ":"))
+      ))
 
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
@@ -655,13 +653,28 @@ Major Mode for editing ML-Yacc files." t nil)
  '(column-number-mode t)
  '(elisp-cache-byte-compile-files t)
  '(ibuffer-enable t)
- '(ibuffer-formats (quote ((mark modified read-only " " (name 32 32 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
+ '(ibuffer-formats
+   (quote
+    ((mark modified read-only " "
+           (name 32 32 :left :elide)
+           " "
+           (size 9 -1 :right)
+           " "
+           (mode 16 16 :left :elide)
+           " " filename-and-process)
+     (mark " "
+           (name 16 -1)
+           " " filename))))
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
- '(package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
+ '(package-archives
+   (quote
+    (("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa" . "http://melpa.milkbox.net/packages/"))))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values (quote ((css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
+ '(show-trailing-whitespace t)
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
@@ -669,18 +682,36 @@ Major Mode for editing ML-Yacc files." t nil)
 
 (when (and window-system (not (eq window-system 'ns)))
   (custom-set-faces
-   '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
-   '(font-lock-comment-face ((nil (:foreground "goldenrod4"))))
-   '(font-lock-function-name-face ((nil (:foreground "blue"))))
-   '(font-lock-keyword-face ((t (:foreground "maroon"))))
-   '(font-lock-string-face ((nil (:foreground "forestgreen"))))
-   '(font-lock-type-face ((t (:foreground "darkorange3"))))
-   '(font-lock-variable-name-face ((((class color) (background light)) (:foreground "blue4"))))
-   '(mode-line ((t (:background "grey90" :foreground "black" :box nil))))
-   '(trailing-whitespace ((((class color) (background light)) (:background "gray90")))))
-  )
+   '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))
 
 (when (and window-system (eq window-system 'ns))
+  (cond
+
+   ;; ;; I was trying out Inconsolata for a while, and I might give it another
+   ;; ;; shot someday.  It's very nice, but it doesn't have a bold weight.  I
+   ;; ;; was fairly surprised that this bothered me, but it did.
+   ;; ((x-family-fonts "Inconsolata")
+   ;;  (custom-set-faces
+   ;;   '(default ((t (:family "Inconsolata" :height 130))))))
+
+   ;; ...so Menlo it is on OSX.
+   ;; Menlo is just a tweaked version of DejaVu Sans Mono.
+   (t
+    (custom-set-faces
+     '(default ((t (:family "Menlo" :height 120))))))
+
+   ))
+
+;; A color scheme that's less obtrusive than the Emacs default.
+;; Guarded with window-system because many terminals render subtle colors badly.
+(when window-system
   (custom-set-faces
-   '(default ((t (:height 120 :family "Menlo")))))
-  )
+   '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
+   '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
+   '(font-lock-string-face ((t (:foreground "#338300"))))
+   '(font-lock-type-face ((t (:foreground "#aa4400"))))
+   '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
+   '(mode-line ((t (:background "#e5e5e5" :box nil))))
+   '(trailing-whitespace ((t (:background "#e5e5e5"))))
+   ))
