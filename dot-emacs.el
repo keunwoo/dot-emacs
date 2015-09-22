@@ -714,5 +714,9 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-type-face ((t (:foreground "#aa4400"))))
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
-   '(trailing-whitespace ((t (:background "#e5e5e5"))))
    ))
+
+;; Some faces we set unconditionally.
+(custom-set-faces
+ '(trailing-whitespace ((t (:background "#e5e5e5")))))
+
