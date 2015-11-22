@@ -631,8 +631,23 @@ Major Mode for editing ML-Yacc files." t nil)
 
       ;; Return final, concatenated/expanded path.
       (setenv "PATH" current-path)
-      (set-variable 'exec-path (split-string (getenv "PATH") ":"))
-      ))
+      (set-variable 'exec-path (split-string (getenv "PATH") ":")))
+  )
+
+;; Try valiantly to make Windows a semi-acceptable dev environment.
+(if (eq system-type 'windows-nt)
+    (progn
+      (setenv "PATH"
+              (mapconcat (lambda (v) v)
+                         (append (split-string (getenv "PATH") ";")
+                                 '(
+                                   "c:\\Program Files\\Git\\bin"
+                                   "c:\\Program Files\\Git\\usr\\bin"
+                                   ))
+                         ";"))
+      (set-variable 'exec-path (split-string (getenv "PATH") ";")))
+  )
+
 
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
