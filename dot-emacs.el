@@ -10,6 +10,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;; EDITING ;;;;;;;;;;;;;;;;;;;;;;;
 
+;; TODO(keunwoo): figure out why I need this; without it we get:
+;; Symbol's function definition is void: "eieio-build-class-alist"
+(require 'eieio-opt)
+
 ;; Get tabs the way I want
 (setq-default indent-tabs-mode nil)
 
@@ -332,7 +336,7 @@
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
 ;; Golang stuff.
-;;(setq gofmt-command "goimports")
+(setq gofmt-command "goimports")
 (add-hook 'after-init-hook
           (lambda ()
             (if (require 'go-mode nil t)
@@ -722,7 +726,7 @@ Major Mode for editing ML-Yacc files." t nil)
 
 ;; A color scheme that's less obtrusive than the Emacs default.
 ;; Guarded with window-system because many terminals render subtle colors badly.
-(when window-system
+(if window-system
   (custom-set-faces
    '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
    '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
@@ -731,4 +735,15 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-type-face ((t (:foreground "#aa4400"))))
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
-   ))
+   )
+  ;; In terminal, just use less boldface and yellow.
+  (custom-set-faces
+   '(font-lock-comment-face ((t nil)))
+   '(font-lock-function-name-face ((t (:foreground "blue"))))
+   '(trailing-whitespace ((t (:background "white"))))
+   '(web-mode-html-attr-name-face ((t nil)))
+   '(web-mode-html-tag-bracket-face ((t nil)))
+   '(web-mode-html-tag-face ((t nil)))
+   )
+)
+(put 'scroll-left 'disabled nil)
