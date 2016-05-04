@@ -634,6 +634,21 @@ Major Mode for editing ML-Yacc files." t nil)
       (set-variable 'exec-path (split-string (getenv "PATH") ":"))
       ))
 
+;; Try valiantly to make Windows a semi-acceptable dev environment.
+(if (eq system-type 'windows-nt)
+    (progn
+      (setenv "PATH"
+              (mapconcat (lambda (v) v)
+                         (append (split-string (getenv "PATH") ";")
+                                 '(
+                                   "c:\\Program Files\\Git\\bin"
+                                   "c:\\Program Files\\Git\\usr\\bin"
+                                   ))
+                         ";"))
+      (set-variable 'exec-path (split-string (getenv "PATH") ";")))
+  )
+
+
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
 ;;
@@ -681,27 +696,29 @@ Major Mode for editing ML-Yacc files." t nil)
  '(visible-bell t)
  '(visible-cursor nil))
 
-(when (and window-system (not (eq window-system 'ns)))
-  (custom-set-faces
-   '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))
+(when window-system
+  (cond ((eq window-system 'ns)
+         (progn
+           ;; I was trying out Inconsolata for a while, and I might
+           ;; give it another shot someday.  It's very nice, but it
+           ;; doesn't have a bold weight.  I was fairly surprised that
+           ;; this bothered me, but it did.
+           ;; ((x-family-fonts "Inconsolata")
+           ;;  (custom-set-faces
+           ;;   '(default ((t (:family "Inconsolata" :height 130))))))
 
-(when (and window-system (eq window-system 'ns))
-  (cond
+           ;; ...so Menlo it is on OSX.
+           ;; Menlo is just a tweaked version of DejaVu Sans Mono.
+           (custom-set-faces
+            '(default ((t (:family "Menlo" :height 120)))))))
 
-   ;; ;; I was trying out Inconsolata for a while, and I might give it another
-   ;; ;; shot someday.  It's very nice, but it doesn't have a bold weight.  I
-   ;; ;; was fairly surprised that this bothered me, but it did.
-   ;; ((x-family-fonts "Inconsolata")
-   ;;  (custom-set-faces
-   ;;   '(default ((t (:family "Inconsolata" :height 130))))))
+        ((eq window-system 'w32)
+         (custom-set-faces
+          '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 90 :width normal :foundry "outline" :family "Consolas"))))))
 
-   ;; ...so Menlo it is on OSX.
-   ;; Menlo is just a tweaked version of DejaVu Sans Mono.
-   (t
-    (custom-set-faces
-     '(default ((t (:family "Menlo" :height 120))))))
-
-   ))
+        (t
+         (custom-set-faces
+          '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))))
 
 ;; A color scheme that's less obtrusive than the Emacs default.
 ;; Guarded with window-system because many terminals render subtle colors badly.
@@ -715,8 +732,3 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
    ))
-
-;; Some faces we set unconditionally.
-(custom-set-faces
- '(trailing-whitespace ((t (:background "#e5e5e5")))))
-
