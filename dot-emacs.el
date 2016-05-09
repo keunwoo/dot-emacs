@@ -91,7 +91,7 @@
     ;; XEmacs.  To re-enable: M-x set-specifier menubar-visible-p 't
     (set-specifier menubar-visible-p nil)
   ;; FSF
-  (menu-bar-mode nil))
+  (menu-bar-mode -1))
 
 ;; Or a #@&$!&@ blinking cursor?
 (if (not (string-match "XEmacs" emacs-version))
