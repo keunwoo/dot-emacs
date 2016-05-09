@@ -704,8 +704,9 @@ Major Mode for editing ML-Yacc files." t nil)
  '(longlines-wrap-follows-window-size t)
  '(package-archives
    (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa" . "http://melpa.milkbox.net/packages/"))))
+    (("gnu" . "https://elpa.gnu.org/packages/")
+     ;; ("marmalade" .  "https://marmalade-repo.org/packages/")
+     ("melpa" . "https://melpa.org/packages/"))))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values (quote ((css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
