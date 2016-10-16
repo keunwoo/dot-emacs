@@ -10,6 +10,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;; EDITING ;;;;;;;;;;;;;;;;;;;;;;;
 
+;; TODO(keunwoo): figure out why I need this; without it we get:
+;; Symbol's function definition is void: "eieio-build-class-alist"
+(require 'eieio-opt)
+
 ;; Get tabs the way I want
 (setq-default indent-tabs-mode nil)
 
@@ -91,7 +95,7 @@
     ;; XEmacs.  To re-enable: M-x set-specifier menubar-visible-p 't
     (set-specifier menubar-visible-p nil)
   ;; FSF
-  (menu-bar-mode nil))
+  (menu-bar-mode -1))
 
 ;; Or a #@&$!&@ blinking cursor?
 (if (not (string-match "XEmacs" emacs-version))
@@ -640,8 +644,38 @@ Major Mode for editing ML-Yacc files." t nil)
 
       ;; Return final, concatenated/expanded path.
       (setenv "PATH" current-path)
-      (set-variable 'exec-path (split-string (getenv "PATH") ":"))
-      ))
+      (set-variable 'exec-path (split-string (getenv "PATH") ":")))
+  )
+
+;; Try valiantly to make Windows a semi-acceptable dev environment.
+(if (eq system-type 'windows-nt)
+    (progn
+      (setenv "PATH"
+              (mapconcat (lambda (v) v)
+                         (append (split-string (getenv "PATH") ";")
+                                 '(
+                                   "c:\\Program Files\\Git\\bin"
+                                   "c:\\Program Files\\Git\\usr\\bin"
+                                   ))
+                         ";"))
+      (set-variable 'exec-path (split-string (getenv "PATH") ";")))
+  )
+
+
+;; Try valiantly to make Windows a semi-acceptable dev environment.
+(if (eq system-type 'windows-nt)
+    (progn
+      (setenv "PATH"
+              (mapconcat (lambda (v) v)
+                         (append (split-string (getenv "PATH") ";")
+                                 '(
+                                   "c:\\Program Files\\Git\\bin"
+                                   "c:\\Program Files\\Git\\usr\\bin"
+                                   ))
+                         ";"))
+      (set-variable 'exec-path (split-string (getenv "PATH") ";")))
+  )
+
 
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
@@ -680,8 +714,9 @@ Major Mode for editing ML-Yacc files." t nil)
  '(octave-block-offset 4)
  '(package-archives
    (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa" . "http://melpa.milkbox.net/packages/"))))
+    (("gnu" . "https://elpa.gnu.org/packages/")
+     ;; ("marmalade" .  "https://marmalade-repo.org/packages/")
+     ("melpa" . "https://melpa.org/packages/"))))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values (quote ((css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
@@ -691,31 +726,33 @@ Major Mode for editing ML-Yacc files." t nil)
  '(visible-bell t)
  '(visible-cursor nil))
 
-(when (and window-system (not (eq window-system 'ns)))
-  (custom-set-faces
-   '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))
+(when window-system
+  (cond ((eq window-system 'ns)
+         (progn
+           ;; I was trying out Inconsolata for a while, and I might
+           ;; give it another shot someday.  It's very nice, but it
+           ;; doesn't have a bold weight.  I was fairly surprised that
+           ;; this bothered me, but it did.
+           ;; ((x-family-fonts "Inconsolata")
+           ;;  (custom-set-faces
+           ;;   '(default ((t (:family "Inconsolata" :height 130))))))
 
-(when (and window-system (eq window-system 'ns))
-  (cond
+           ;; ...so Menlo it is on OSX.
+           ;; Menlo is just a tweaked version of DejaVu Sans Mono.
+           (custom-set-faces
+            '(default ((t (:family "Menlo" :height 120)))))))
 
-   ;; ;; I was trying out Inconsolata for a while, and I might give it another
-   ;; ;; shot someday.  It's very nice, but it doesn't have a bold weight.  I
-   ;; ;; was fairly surprised that this bothered me, but it did.
-   ;; ((x-family-fonts "Inconsolata")
-   ;;  (custom-set-faces
-   ;;   '(default ((t (:family "Inconsolata" :height 130))))))
+        ((eq window-system 'w32)
+         (custom-set-faces
+          '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 90 :width normal :foundry "outline" :family "Consolas"))))))
 
-   ;; ...so Menlo it is on OSX.
-   ;; Menlo is just a tweaked version of DejaVu Sans Mono.
-   (t
-    (custom-set-faces
-     '(default ((t (:family "Menlo" :height 120))))))
-
-   ))
+        (t
+         (custom-set-faces
+          '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))))
 
 ;; A color scheme that's less obtrusive than the Emacs default.
 ;; Guarded with window-system because many terminals render subtle colors badly.
-(when window-system
+(if window-system
   (custom-set-faces
    '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
    '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
@@ -724,8 +761,20 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-type-face ((t (:foreground "#aa4400"))))
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
-   ))
+   )
+  ;; In terminal, just use less boldface and yellow.
+  (custom-set-faces
+   '(font-lock-comment-face ((t nil)))
+   '(font-lock-function-name-face ((t (:foreground "blue"))))
+   '(trailing-whitespace ((t (:background "white"))))
+   '(web-mode-html-attr-name-face ((t nil)))
+   '(web-mode-html-tag-bracket-face ((t nil)))
+   '(web-mode-html-tag-face ((t nil)))
+   )
+)
 
 ;; Some faces we set unconditionally.
 (custom-set-faces
  '(trailing-whitespace ((t (:underline "#e3e3e3")))))
+
+(put 'scroll-left 'disabled nil)
