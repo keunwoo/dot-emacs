@@ -728,5 +728,4 @@ Major Mode for editing ML-Yacc files." t nil)
 
 ;; Some faces we set unconditionally.
 (custom-set-faces
- '(trailing-whitespace ((t (:background "#e5e5e5")))))
-
+ '(trailing-whitespace ((t (:underline "#e3e3e3")))))
