@@ -346,6 +346,9 @@
                 (require 'go-oracle nil t)
                 (add-hook 'before-save-hook 'gofmt-before-save)))))
 
+;; rust-mode
+(add-hook 'rust-mode-hook #'rust-enable-format-on-save)
+
 ;; js2-mode
 ;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
 (autoload 'js2-mode "js2" nil t)
