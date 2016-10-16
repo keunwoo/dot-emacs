@@ -64,6 +64,10 @@
 ;; That splash screen is idiotic.
 (setq inhibit-splash-screen t)
 
+;; The "visible bell" in Emacs for OS X is a fucking piece of garbage.
+;; https://www.reddit.com/r/emacs/comments/3omsr2/weird_display_issue_in_os_x/
+(setq ring-bell-function (lambda () (message "*woop*")))
+
 ;; Turn font lock on for all modes
 (if (string-match "XEmacs" emacs-version)
     ;; XEmacs
