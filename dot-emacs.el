@@ -380,6 +380,8 @@
 ;; use fundamental for editing JSON (it's good enough, and js2 is too finicky)
 (add-to-list 'auto-mode-alist '("\\.json$" . fundamental-mode))
 
+(add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
+
 ;; MODE HOOKS TEMPLATE
 ;;
 ;; Sometimes these first two expressions are not necessary
@@ -675,6 +677,7 @@ Major Mode for editing ML-Yacc files." t nil)
            " " filename))))
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
+ '(octave-block-offset 4)
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
