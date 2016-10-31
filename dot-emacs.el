@@ -332,11 +332,17 @@
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
 ;; Golang stuff.
-(setq gofmt-command "goimports")
+(defun auto-complete-for-go () (auto-complete-mode 1))
 (add-hook 'after-init-hook
           (lambda ()
             (if (require 'go-mode nil t)
               (progn
+                (setq gofmt-command "goimports")
+
+                ;; Try to setup autocomplete.
+                (if (require 'go-autocomplete nil t)
+                    (add-hook 'go-mode-hook 'auto-complete-for-go))
+
                 ;; I symlink oracle.el to go-oracle.el in my local site-emacs
                 ;; dir so that 'require go-oracle works (instead of load-file).
                 (require 'go-oracle nil t)
@@ -699,7 +705,7 @@ Major Mode for editing ML-Yacc files." t nil)
    ;; Menlo is just a tweaked version of DejaVu Sans Mono.
    (t
     (custom-set-faces
-     '(default ((t (:family "Menlo" :height 120))))))
+     '(default ((t (:family "Menlo" :height 110))))))
 
    ))
 
@@ -707,11 +713,12 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; Guarded with window-system because many terminals render subtle colors badly.
 (when window-system
   (custom-set-faces
-   '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   ;; '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   '(font-lock-comment-face ((t (:foreground "#997777"))))
    '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
    '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
    '(font-lock-string-face ((t (:foreground "#338300"))))
-   '(font-lock-type-face ((t (:foreground "#aa4400"))))
+   '(font-lock-type-face ((t (:foreground "#665500"))))
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
    ))
