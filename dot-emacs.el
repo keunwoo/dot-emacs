@@ -404,6 +404,10 @@
             (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
             (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
             (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
+(defun my-web-mode-hook ()
+  "Hooks for Web mode."
+  (setq web-mode-markup-indent-offset 2))
+(add-hook 'web-mode-hook 'my-web-mode-hook)
 
 ;; CSS mode
 (add-hook 'css-mode-hook
@@ -687,6 +691,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(blink-cursor-mode nil)
  '(column-number-mode t)
  '(elisp-cache-byte-compile-files t)
+ '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
    (quote
@@ -705,10 +710,12 @@ Major Mode for editing ML-Yacc files." t nil)
  '(package-archives
    (quote
     (("gnu" . "https://elpa.gnu.org/packages/")
-     ;; ("marmalade" .  "https://marmalade-repo.org/packages/")
      ("melpa" . "https://melpa.org/packages/"))))
  '(ps-print-header-frame nil)
- '(safe-local-variable-values (quote ((css-indent-offset . 2))))
+ '(safe-local-variable-values
+   (quote
+    ((buffer-file-coding-system . utf-8-dos)
+     (css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
  '(show-trailing-whitespace t)
  '(tool-bar-mode nil)
