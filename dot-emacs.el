@@ -68,6 +68,10 @@
 ;; That splash screen is idiotic.
 (setq inhibit-splash-screen t)
 
+;; The "visible bell" in Emacs for OS X is a fucking piece of garbage.
+;; https://www.reddit.com/r/emacs/comments/3omsr2/weird_display_issue_in_os_x/
+(setq ring-bell-function (lambda () (message "*woop*")))
+
 ;; Turn font lock on for all modes
 (if (string-match "XEmacs" emacs-version)
     ;; XEmacs
@@ -336,15 +340,24 @@
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
 ;; Golang stuff.
-(setq gofmt-command "goimports")
+(defun auto-complete-for-go () (auto-complete-mode 1))
 (add-hook 'after-init-hook
           (lambda ()
             (if (require 'go-mode nil t)
               (progn
+                (setq gofmt-command "goimports")
+
+                ;; Try to setup autocomplete.
+                (if (require 'go-autocomplete nil t)
+                    (add-hook 'go-mode-hook 'auto-complete-for-go))
+
                 ;; I symlink oracle.el to go-oracle.el in my local site-emacs
                 ;; dir so that 'require go-oracle works (instead of load-file).
                 (require 'go-oracle nil t)
                 (add-hook 'before-save-hook 'gofmt-before-save)))))
+
+;; rust-mode
+(add-hook 'rust-mode-hook #'rust-enable-format-on-save)
 
 ;; js2-mode
 ;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
@@ -376,6 +389,8 @@
 
 ;; use fundamental for editing JSON (it's good enough, and js2 is too finicky)
 (add-to-list 'auto-mode-alist '("\\.json$" . fundamental-mode))
+
+(add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
 ;; MODE HOOKS TEMPLATE
 ;;
@@ -707,6 +722,7 @@ Major Mode for editing ML-Yacc files." t nil)
            " " filename))))
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
+ '(octave-block-offset 4)
  '(package-archives
    (quote
     (("gnu" . "https://elpa.gnu.org/packages/")
@@ -737,7 +753,7 @@ Major Mode for editing ML-Yacc files." t nil)
            ;; ...so Menlo it is on OSX.
            ;; Menlo is just a tweaked version of DejaVu Sans Mono.
            (custom-set-faces
-            '(default ((t (:family "Menlo" :height 120)))))))
+            '(default ((t (:family "Menlo" :height 110)))))))
 
         ((eq window-system 'w32)
          (custom-set-faces
@@ -751,11 +767,12 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; Guarded with window-system because many terminals render subtle colors badly.
 (if window-system
   (custom-set-faces
-   '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   ;; '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   '(font-lock-comment-face ((t (:foreground "#997777"))))
    '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
    '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
    '(font-lock-string-face ((t (:foreground "#338300"))))
-   '(font-lock-type-face ((t (:foreground "#aa4400"))))
+   '(font-lock-type-face ((t (:foreground "#665500"))))
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
    )
@@ -769,4 +786,9 @@ Major Mode for editing ML-Yacc files." t nil)
    '(web-mode-html-tag-face ((t nil)))
    )
 )
+
+;; Some faces we set unconditionally.
+(custom-set-faces
+ '(trailing-whitespace ((t (:underline "#e3e3e3")))))
+
 (put 'scroll-left 'disabled nil)
