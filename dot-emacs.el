@@ -119,7 +119,7 @@
 (line-number-mode 1)
 (column-number-mode 1)
 
-;(require 'column-marker)
+;; (require 'column-marker)
 (add-hook 'java-mode-hook
           '(lambda ()
              ; (font-lock-set-up-width-warning 100)
@@ -339,19 +339,23 @@
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
-;; Golang stuff.
+;; go-mode
 (setq gofmt-command "goimports")
+(add-hook 'go-mode-hook
+          (lambda () (interactive) 
+            (column-marker-1 80)))
 (add-hook 'after-init-hook
           (lambda ()
             (if (require 'go-mode nil t)
               (progn
-                ;; I symlink oracle.el to go-oracle.el in my local site-emacs
-                ;; dir so that 'require go-oracle works (instead of load-file).
-                (require 'go-oracle nil t)
                 (add-hook 'before-save-hook 'gofmt-before-save)))))
 
 ;; rust-mode
-(add-hook 'rust-mode-hook #'rust-enable-format-on-save)
+(add-hook 'rust-mode-hook 
+          (lambda ()
+            (interactive)
+            (rust-enable-format-on-save)
+            (column-marker-1 100)))
 
 ;; js2-mode
 ;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
