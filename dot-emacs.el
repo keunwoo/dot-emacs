@@ -344,11 +344,19 @@
 (add-hook 'go-mode-hook
           (lambda () (interactive) 
             (column-marker-1 80)))
+(defun auto-complete-for-go () (auto-complete-mode 1))
 (add-hook 'after-init-hook
           (lambda ()
             (if (require 'go-mode nil t)
               (progn
-                (add-hook 'before-save-hook 'gofmt-before-save)))))
+                (setq gofmt-command "goimports")
+
+                ;; Try to setup autocomplete.
+                (if (require 'go-autocomplete nil t)
+                    (add-hook 'go-mode-hook 'auto-complete-for-go))
+
+                (add-hook 'before-save-hook 'gofmt-before-save)
+                ))))
 
 ;; rust-mode
 (add-hook 'rust-mode-hook 
@@ -386,7 +394,14 @@
                        " *, *" t))))))
 
 ;; use fundamental for editing JSON (it's good enough, and js2 is too finicky)
-(add-to-list 'auto-mode-alist '("\\.json$" . fundamental-mode))
+;; (add-to-list 'auto-mode-alist '("\\.json$" . fundamental-mode))
+;;
+;; no, use json-mode
+(add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+(add-hook 'json-mode-hook
+          (lambda ()
+            (make-local-variable 'js-indent-level)
+                        (setq js-indent-level 2)))
 
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
@@ -417,6 +432,13 @@
             (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
             (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
             (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
+(defun my-web-mode-hook ()
+  "Hooks for Web mode."
+  (add-hook 'local-write-file-hooks
+            (lambda ()
+              (delete-trailing-whitespace)
+              nil)))
+(add-hook 'web-mode-hook 'my-web-mode-hook)
 
 ;; CSS mode
 (add-hook 'css-mode-hook
@@ -666,21 +688,6 @@ Major Mode for editing ML-Yacc files." t nil)
   )
 
 
-;; Try valiantly to make Windows a semi-acceptable dev environment.
-(if (eq system-type 'windows-nt)
-    (progn
-      (setenv "PATH"
-              (mapconcat (lambda (v) v)
-                         (append (split-string (getenv "PATH") ";")
-                                 '(
-                                   "c:\\Program Files\\Git\\bin"
-                                   "c:\\Program Files\\Git\\usr\\bin"
-                                   ))
-                         ";"))
-      (set-variable 'exec-path (split-string (getenv "PATH") ";")))
-  )
-
-
 ;; I always write ~/lib/emacs/site-lisp-keunwoo.el that provides my
 ;; site-specific customizations, as follows:
 ;;
@@ -700,6 +707,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(blink-cursor-mode nil)
  '(column-number-mode t)
  '(elisp-cache-byte-compile-files t)
+ '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
    (quote
@@ -713,22 +721,30 @@ Major Mode for editing ML-Yacc files." t nil)
      (mark " "
            (name 16 -1)
            " " filename))))
+ '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
  '(octave-block-offset 4)
  '(package-archives
    (quote
     (("gnu" . "https://elpa.gnu.org/packages/")
-     ;; ("marmalade" .  "https://marmalade-repo.org/packages/")
      ("melpa" . "https://melpa.org/packages/"))))
  '(ps-print-header-frame nil)
- '(safe-local-variable-values (quote ((css-indent-offset . 2))))
+ '(safe-local-variable-values
+   (quote
+    ((buffer-file-coding-system . utf-8-dos)
+     (css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
  '(show-trailing-whitespace t)
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
- '(visible-cursor nil))
+ '(visible-cursor nil)
+ '(web-mode-script-padding 0)
+ '(web-mode-style-padding 4)
+ '(whitespace-style
+   (quote
+    (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
 
 (when window-system
   (cond ((eq window-system 'ns)
@@ -744,7 +760,7 @@ Major Mode for editing ML-Yacc files." t nil)
            ;; ...so Menlo it is on OSX.
            ;; Menlo is just a tweaked version of DejaVu Sans Mono.
            (custom-set-faces
-            '(default ((t (:family "Menlo" :height 120)))))))
+            '(default ((t (:family "Menlo" :height 110)))))))
 
         ((eq window-system 'w32)
          (custom-set-faces
@@ -758,11 +774,12 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; Guarded with window-system because many terminals render subtle colors badly.
 (if window-system
   (custom-set-faces
-   '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   ;; '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   '(font-lock-comment-face ((t (:foreground "#997777"))))
    '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
    '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
    '(font-lock-string-face ((t (:foreground "#338300"))))
-   '(font-lock-type-face ((t (:foreground "#aa4400"))))
+   '(font-lock-type-face ((t (:foreground "#665500"))))
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
    )
@@ -774,11 +791,15 @@ Major Mode for editing ML-Yacc files." t nil)
    '(web-mode-html-attr-name-face ((t nil)))
    '(web-mode-html-tag-bracket-face ((t nil)))
    '(web-mode-html-tag-face ((t nil)))
-   )
-)
+   '(whitespace-indentation ((t (:foreground "firebrick"))))
+   '(whitespace-tab ((t (:foreground "yellow")))))
+  )
 
 ;; Some faces we set unconditionally.
-(custom-set-faces
- '(trailing-whitespace ((t (:underline "#e3e3e3")))))
+;; not sure I like this...
+;;(custom-set-faces
+;;  '(trailing-whitespace ((t (:underline "#e3e3e3")))))
 
 (put 'scroll-left 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
