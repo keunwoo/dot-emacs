@@ -350,7 +350,7 @@
 (setq gofmt-command "goimports")
 (add-hook 'go-mode-hook
           (lambda () (interactive) 
-            (column-marker-1 80)))
+            (column-marker-1 100)))
 (defun auto-complete-for-go () (auto-complete-mode 1))
 (add-hook 'after-init-hook
           (lambda ()
@@ -370,7 +370,7 @@
           (lambda ()
             (interactive)
             (rust-enable-format-on-save)
-            (column-marker-1 100)))
+            (column-marker-1 99)))
 
 ;; js2-mode
 ;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
