@@ -547,16 +547,6 @@ Major Mode for editing ML-Yacc files." t nil)
 ;          '(lambda ()
 ;             (define-key jde-mode-map "\C-c\C-v\C-c" 'compile)))
 (require 'compile)
-(if (string-match "XEmacs" emacs-version)
-    (progn
-      (set-variable
-       'compilation-error-regexp-alist-alist
-       (cons
-        '(all
-          ("\\File \"\\(.*\\)\", line \\([0-9]+\\), character \\([0-9]+\\).*:"
-           1 2 3))
-        compilation-error-regexp-alist-alist))
-      (compilation-build-compilation-error-regexp-alist)))
 
 ;; C/C++ modes.
 (add-hook 'c-mode-hook
