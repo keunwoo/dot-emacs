@@ -702,6 +702,7 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
+ '(c-offsets-alist (quote ((innamespace . 0))))
  '(column-number-mode t)
  '(elisp-cache-byte-compile-files t)
  '(grep-command "grep -nHi ")
