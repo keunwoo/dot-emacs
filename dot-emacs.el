@@ -543,10 +543,17 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; MultiJava/HydroJ uses JDE mode
 (setq auto-mode-alist (cons '("\\.\\(mj\\|hj\\)$" . jde-mode)
                             auto-mode-alist))
-;(add-hook 'jde-mode-hook
-;          '(lambda ()
-;             (define-key jde-mode-map "\C-c\C-v\C-c" 'compile)))
+;;(add-hook 'jde-mode-hook
+;;          '(lambda ()
+;;             (define-key jde-mode-map "\C-c\C-v\C-c" 'compile)))
+
+;; compilation mode
 (require 'compile)
+;; Recipe from https://stackoverflow.com/questions/13397737/ansi-coloring-in-compilation-mode
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (ansi-color-apply-on-region compilation-filter-start (point)))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
 ;; C/C++ modes.
 (add-hook 'c-mode-hook
