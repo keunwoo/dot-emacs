@@ -556,12 +556,8 @@ Major Mode for editing ML-Yacc files." t nil)
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
 ;; C/C++ modes.
-(add-hook 'c-mode-hook
-          '(lambda ()
-             (font-lock-mode)))
 (add-hook 'c++-mode-hook
           '(lambda ()
-             (font-lock-mode)
              (setq ps-print-color-p 't)))
 
 ; I haven't found a good editing mode for arbitrary XML.  sgml-mode
