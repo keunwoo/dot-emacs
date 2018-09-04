@@ -6,10 +6,7 @@
 
 ;; Custom load paths
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
+;; Added by Package.el.  This must come before configurations of installed packages.
 (package-initialize)
 
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/emacs"))
@@ -80,38 +77,18 @@
 (setq ring-bell-function (lambda () (message "*woop*")))
 
 ;; Turn font lock on for all modes
-(if (string-match "XEmacs" emacs-version)
-    ;; XEmacs
-    (font-lock-mode)
-  ;; FSF
-  (global-font-lock-mode 't))
-
-;; Who needs a 3D modeline?
-(if (string-match "XEmacs" emacs-version)
-    (set-specifier modeline-shadow-thickness 0))
+(global-font-lock-mode 't)
 
 ;; Or a toolbar?
-(if (string-match "XEmacs" emacs-version)
-    (set-specifier default-toolbar-visible-p nil)
-  ;; FSF only has a toggle, not a "turn it off" function.
-  (if (functionp 'tool-bar-mode)
-      (tool-bar-mode -1)))
+(if (functionp 'tool-bar-mode)
+    (tool-bar-mode -1))
 
-; Or a menubar?
-(if (string-match "XEmacs" emacs-version)
-    ;; XEmacs.  To re-enable: M-x set-specifier menubar-visible-p 't
-    (set-specifier menubar-visible-p nil)
-  ;; FSF
-  (menu-bar-mode -1))
+;; Or a menubar? (except on OS X, where the menubar is always there anyway)
+(if (not (eq window-system 'ns))
+    (menu-bar-mode -1))
 
 ;; Or a #@&$!&@ blinking cursor?
-(if (not (string-match "XEmacs" emacs-version))
-    (blink-cursor-mode nil))
-
-;; I know what I'm doing w.r.t. key mappings; don't warn me.
-(if (string-match "XEmacs" emacs-version)
-    (setq display-warning-suppressed-classes
-          (cons 'key-mapping display-warning-suppressed-classes)))
+(blink-cursor-mode nil)
 
 ;; Start gnuserv (enables inverse search in KDVI)
 ;;(gnuserv-start)
@@ -151,9 +128,9 @@
 
 ;; Rotates among some standardized frame widths.
 (defvar frame-width-rotation
-  ;; preferred column widths for python/js/C++, rust, java, go
-  ;; (well, go doesn't have a recommended width, but 120 fits most code)
-  '(80 99 100 120)
+  ;; preferred column widths for python/js/C++, rust, java, go, Airtable js
+  ;; (well, go & Airtable don't have a recommended width, but 120/140 fits most code)
+  '(80 99 100 120 140)
   "List of column widths to rotate.")
 (defun frame-width-next (frame)
   "Returns next width for frame in frame-width-rotation."
@@ -193,77 +170,29 @@
 (define-key global-map "\C-c\C-v" 'compile)
 (define-key global-map "\C-c\C-m" 'compile)
 
-;; find-file provides functions to switch between spec and body
-;; (useful in Ada and C++, which languages define specifications and
-;; bodies of packages in separate files).
-;;
-;; Q: Why don't those $%&!ing Emacs people define a function
-;; "defined-p" so users don't have to match on the Emacs version
-;; string?
-(if (string-match "XEmacs" emacs-version)
-    (let ((find-file-package-installed-p (file-installed-p "find-file.el")))
-      (if find-file-package-installed-p
-          (progn
-            (require 'find-file "find-file")
-            (setq-default cc-other-file-alist
-                          '(
-                            ("\\.cc$"  (".hh" ".h"))
-                            ("\\.hh$"  (".cc" ".C"))
+;; Enable recursive minibuffers
+(set-variable 'enable-recursive-minibuffers 't)
 
-                            ("\\.c$"   (".h"))
-                            ("\\.h$"   (".c" ".cc" ".C" ".CC" ".cxx" ".cpp"))
-
-                            ("\\.C$"   (".H"  ".hh" ".h"))
-                            ("\\.H$"   (".C"  ".CC"))
-
-                            ("\\.CC$"  (".HH" ".H"  ".hh" ".h"))
-                            ("\\.HH$"  (".CC"))
-
-                            ("\\.cxx$" (".hh" ".h"))
-                            ("\\.cpp$" (".hpp" ".hh" ".h"))
-                            ("\\.hpp$" (".cpp"))
-                            ))
-            (define-key global-map "\C-co" 'ff-find-other-file)))))
-
-;; Minibuffer hacks for FSF Emacs
-(if (not (string-match "XEmacs" emacs-version))
-    (progn
-
-      ;; Tab-completion in minibuffer (thanks to Ami Fischman)
-      (if (< 24 emacs-major-version)
-          (defadvice read-from-minibuffer
-            (around tab-is-pcomplete-in-minibuffer activate)
-            "Bind TAB to pcomplete in minibuffer reads."
-            (let ((keymap minibuffer-local-map))
-              (define-key keymap "\t" 'pcomplete)
-              (ad-set-arg 2 keymap)
-              ad-do-it)))
-
-      ;; Enable recursive minibuffers
-      (set-variable 'enable-recursive-minibuffers 't)
-
-      ))
-
-; man page lookup (by default, f1 is help, but I already know how to
-; bring that up using C-h)
+;; man page lookup (by default, f1 is help, but I already know how to
+;; bring that up using C-h)
 (define-key global-map [f1]
   (lambda () (interactive) (manual-entry (current-word))))
 
-; F2 to spawn another frame
+;; F2 to spawn another frame
 (define-key global-map [f2] (lambda () (interactive) (make-frame)))
 
-; F3 to kill the other window
+;; F3 to kill the other window
 (define-key global-map [f3] (lambda () (interactive) (delete-other-windows)))
 
-; F4 for dired buffer of the current directory in the other window
+;; F4 for dired buffer of the current directory in the other window
 (define-key global-map [f4]
   (lambda () (interactive) (dired-other-window default-directory)))
 
-; F5 to quickly call *scratch* in the other window
+;; F5 to quickly call *scratch* in the other window
 (define-key global-map [f5]
   (lambda () (interactive) (switch-to-buffer-other-window "*scratch*")))
 
-; F6 to rename the current buffer
+;; F6 to rename the current buffer
 (define-key global-map [f6]
   (lambda () (interactive)
     (rename-buffer
@@ -276,34 +205,30 @@
 (define-key global-map [f7]
   (lambda () (interactive) (frame-width-rotate)))
 
-; F8 to open dired buffer of the current directory, without dotfiles
+;; F8 to open dired buffer of the current directory, without dotfiles
 (define-key global-map [f8]
   (lambda () (interactive)
     (dired-other-window (concat default-directory "[^.]*"))))
 
-; F9 to re-execute last compilation
+;; F9 to re-execute last compilation
 (define-key global-map [f9]
   (lambda () (interactive) (recompile)))
 
-; ibuffer is better than the normal buffer list.
+;; ibuffer is better than the normal buffer list.
 (define-key global-map "\C-x\C-b" 'ibuffer)
 
-; PrntScrn to invoke ps-print and generate an output PostScript file.
-;(require 'ps-print)
-;(define-key global-map [print]
-;  (lambda ()
-;    (interactive)
-;    (setq ps-print-color-p t)
-;    (ps-print-buffer-with-faces
-;     (read-string "PS output filename: "))))
+;; PrntScrn to invoke ps-print and generate an output PostScript file.
+;;(require 'ps-print)
+;;(define-key global-map [print]
+;;  (lambda ()
+;;    (interactive)
+;;    (setq ps-print-color-p t)
+;;    (ps-print-buffer-with-faces
+;;     (read-string "PS output filename: "))))
 
-; Handy incremental scrolling keys
+;; Handy incremental scrolling keys
 (define-key global-map "\M-n" (lambda () (interactive) (scroll-up 1)))
 (define-key global-map "\M-p" (lambda () (interactive) (scroll-down 1)))
-
-;; delete prior word on XEmacs (FSF Emacs has this by default)
-(if (string-match "XEmacs" emacs-version)
-    (define-key global-map '(control backspace) 'backward-kill-word))
 
 ;; Make alt behave like Meta for all the commands I use frequently.
 ;; Handy when using a single instance of Emacs simultaneously on
@@ -373,9 +298,10 @@
             (column-marker-1 99)))
 
 ;; js2-mode
-;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
+(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
 (autoload 'js2-mode "js2" nil t)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
 ;; from emacswiki:
 ;; After js2 has parsed a js file, we look for jslint globals decl
 ;; comment ("/* global Fred, _, Harry */") and add any symbols to a
@@ -597,8 +523,7 @@ Major Mode for editing ML-Yacc files." t nil)
              ;; (gnuserv-start)
 
              ))
-;; DVI viewer for LaTeX mode (I think XEmacs wants to Customize this
-;; itself, but whatever)
+;; DVI viewer for LaTeX mode.
 (setq tex-dvi-view-command
       (if (eq window-system 'x)
           "evince"
@@ -744,6 +669,9 @@ Major Mode for editing ML-Yacc files." t nil)
    (quote
     (("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/"))))
+ '(package-selected-packages
+   (quote
+    (markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow web-mode flow-minor-mode rjsx-mode js2-mode helm-ls-git)))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    (quote
@@ -755,6 +683,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
  '(visible-cursor nil)
+ '(web-mode-enable-optional-tags nil)
  '(web-mode-script-padding 0)
  '(web-mode-style-padding 4)
  '(whitespace-style
@@ -796,7 +725,9 @@ Major Mode for editing ML-Yacc files." t nil)
    '(font-lock-string-face ((t (:foreground "#338300"))))
    '(font-lock-type-face ((t (:foreground "#665500"))))
    '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
+   '(helm-ls-git-modified-not-staged-face ((t (:foreground "yellow4"))))
    '(mode-line ((t (:background "#e5e5e5" :box nil))))
+   '(trailing-whitespace ((t (:background "gray95"))))
    )
   ;; In terminal, just use less boldface and yellow.
   (custom-set-faces
