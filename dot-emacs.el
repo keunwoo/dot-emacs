@@ -7,7 +7,8 @@
 ;; Custom load paths
 
 ;; Added by Package.el.  This must come before configurations of installed packages.
-(package-initialize)
+(if (fboundp 'package-initialize)
+    (package-initialize))
 
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/emacs"))
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/site-emacs"))
@@ -16,7 +17,7 @@
 
 ;; TODO(keunwoo): figure out why I need this; without it we get:
 ;; Symbol's function definition is void: "eieio-build-class-alist"
-(require 'eieio-opt)
+;; (require 'eieio-opt)
 
 ;; Get tabs the way I want
 (setq-default indent-tabs-mode nil)
@@ -671,7 +672,7 @@ Major Mode for editing ML-Yacc files." t nil)
      ("melpa" . "https://melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow web-mode flow-minor-mode rjsx-mode js2-mode helm-ls-git)))
+    (swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow web-mode js2-mode helm-ls-git)))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    (quote
