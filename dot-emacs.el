@@ -368,11 +368,23 @@
             (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
+  ;; Don't line up indents in various situations; standard indent is fine.
+  (mapc
+   (lambda (indent-situation)
+     (add-to-list 'web-mode-indentation-params
+                  (cons indent-situation nil)))
+   '(
+     "lineup-args"    ;; function arguments
+     "lineup-calls"   ;; chained dotted calls
+     "lineup-ternary" ;; ternary operator arguments
+     ))
+  ;; Delete trailing whitespace on save.
   (add-hook 'local-write-file-hooks
             (lambda ()
               (delete-trailing-whitespace)
               nil)))
 (add-hook 'web-mode-hook 'my-web-mode-hook)
+(custom-set-variables '(web-mode-attr-indent-offset 4))
 
 ;; CSS mode
 (add-hook 'css-mode-hook
