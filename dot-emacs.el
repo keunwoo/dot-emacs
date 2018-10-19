@@ -376,15 +376,16 @@
    '(
      "lineup-args"    ;; function arguments
      "lineup-calls"   ;; chained dotted calls
+     "lineup-concats" ;; string concatenations
      "lineup-ternary" ;; ternary operator arguments
-     ))
+     )
+   )
   ;; Delete trailing whitespace on save.
   (add-hook 'local-write-file-hooks
             (lambda ()
               (delete-trailing-whitespace)
               nil)))
 (add-hook 'web-mode-hook 'my-web-mode-hook)
-(custom-set-variables '(web-mode-attr-indent-offset 4))
 
 ;; CSS mode
 (add-hook 'css-mode-hook
@@ -684,7 +685,7 @@ Major Mode for editing ML-Yacc files." t nil)
      ("melpa" . "https://melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow web-mode js2-mode helm-ls-git)))
+    (adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    (quote
@@ -696,6 +697,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
  '(visible-cursor nil)
+ '(web-mode-attr-indent-offset 4)
  '(web-mode-enable-optional-tags nil)
  '(web-mode-script-padding 0)
  '(web-mode-style-padding 4)
