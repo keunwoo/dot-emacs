@@ -553,6 +553,11 @@ Major Mode for editing ML-Yacc files." t nil)
 (setq auto-mode-alist (cons '("\\.cyc$" . c++-mode)
                             auto-mode-alist))
 
+;; Highlight Flow type errors in compilation.
+(add-to-list 'compilation-error-regexp-alist 'flow)
+(add-to-list 'compilation-error-regexp-alist-alist
+    '(flow "^.*Error -+ \\([a-zA-Z.0-9_/-]+\\):\\([0-9]+\\):\\([0-9]+\\)?$" 1 2 3))
+
 ;; Decorativeness of various modes
 ; (setq-default font-lock-maximum-decoration
 ;              '((cecil-mode . 2) (c++-mode . 3) (t . 2)))
