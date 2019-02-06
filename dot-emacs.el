@@ -130,8 +130,8 @@
 ;; Rotates among some standardized frame widths.
 (defvar frame-width-rotation
   ;; preferred column widths for python/js/C++, rust, java, go, Airtable js
-  ;; (well, go & Airtable don't have a recommended width, but 120/140 fits most code)
-  '(80 99 100 120 140)
+  ;; (well, go & Airtable don't have a recommended width, but 120/130 fits most code)
+  '(80 99 100 120 130)
   "List of column widths to rotate.")
 (defun frame-width-next (frame)
   "Returns next width for frame in frame-width-rotation."
