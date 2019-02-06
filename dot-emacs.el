@@ -686,7 +686,7 @@ Major Mode for editing ML-Yacc files." t nil)
      ("melpa" . "https://melpa.org/packages/"))))
  '(package-selected-packages
    (quote
-    (adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)))
+    (web-mode adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    (quote
