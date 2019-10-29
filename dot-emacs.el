@@ -697,7 +697,8 @@ Major Mode for editing ML-Yacc files." t nil)
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    (quote
-    ((buffer-file-coding-system . utf-8-dos)
+    ((eval rename-buffer "*notes*")
+     (buffer-file-coding-system . utf-8-dos)
      (css-indent-offset . 2))))
  '(scroll-bar-mode (quote right))
  '(show-trailing-whitespace t)
