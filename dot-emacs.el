@@ -272,11 +272,12 @@
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
-;; go-mode
-(setq gofmt-command "goimports")
-(add-hook 'go-mode-hook
-          (lambda () (interactive) 
-            (column-marker-1 100)))
+;;; go-mode
+;; Need to update these...
+;;(setq gofmt-command "goimports")
+;;(add-hook 'go-mode-hook
+;;          (lambda () (interactive)
+;;            (column-marker-1 100)))
 (defun auto-complete-for-go () (auto-complete-mode 1))
 (add-hook 'after-init-hook
           (lambda ()
