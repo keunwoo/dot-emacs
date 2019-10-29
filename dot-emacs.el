@@ -300,9 +300,9 @@
             (column-marker-1 99)))
 
 ;; js2-mode
-(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
-(autoload 'js2-mode "js2" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+;;(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
+;;(autoload 'js2-mode "js2" nil t)
+;;(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 
 ;; from emacswiki:
 ;; After js2 has parsed a js file, we look for jslint globals decl
