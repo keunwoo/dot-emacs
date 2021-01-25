@@ -10,6 +10,7 @@
 (if (fboundp 'package-initialize)
     (package-initialize))
 
+(cd (getenv "HOME"))
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/emacs"))
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/site-emacs"))
 
@@ -135,13 +136,13 @@
   "List of column widths to rotate.")
 (defun frame-width-next (frame)
   "Returns next width for frame in frame-width-rotation."
-  (cl-labels
-      ((helper (n alist)
-               (cond
-                ((eq alist nil)    (car frame-width-rotation))
-                ((> (car alist) n) (car alist))
-                (t                 (helper n (cdr alist))))))
-    (helper (frame-width frame) frame-width-rotation)))
+  (let* ((current-width (frame-width (selected-frame)))
+         (next-width
+          (seq-some (lambda (width) (if (> width current-width) width nil))
+                    frame-width-rotation)))
+    (if (eq next-width nil)
+        (car frame-width-rotation)
+      next-width)))
 (defun frame-width-rotate ()
   "Sets current frame width to next frame width>"
   (let ((f (selected-frame)))
@@ -299,9 +300,10 @@
             (column-marker-1 99)))
 
 ;; js2-mode
-(autoload 'js2-mode (format "js2" emacs-major-version) nil t)
-(autoload 'js2-mode "js2" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+;; TODO(keunwoo): Find a better mode that doesn't require cl (deprecated)
+;; (autoload 'js2-mode (format "js2" emacs-major-version) nil t)
+;; (autoload 'js2-mode "js2" nil t)
+;; (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 
 ;; from emacswiki:
 ;; After js2 has parsed a js file, we look for jslint globals decl
@@ -501,18 +503,20 @@ Major Mode for editing ML-Yacc files." t nil)
              (setq ps-print-color-p 't)))
 ;; From https://stackoverflow.com/questions/23553881/emacs-indenting-of-c11-lambda-functions-cc-mode
 ;; It is embarrassing that this is necessary.
-(defadvice c-lineup-arglist (around my activate)
-  "Improve indentation of continued C++11 lambda function opened as argument."
-  (setq ad-return-value
-        (if (and (equal major-mode 'c++-mode)
-                 (ignore-errors
-                   (save-excursion
-                     (goto-char (c-langelem-pos langelem))
-                     ;; Detect "[...](" or "[...]{". preceded by "," or "(",
-                     ;;   and with unclosed brace.
-                     (looking-at ".*[(,][ \t]*\\[[^]]*\\][ \t]*[({][^}]*$"))))
-            0                           ; no additional indent
-          ad-do-it)))                   ; default behavior
+;; Update to emacs 27: maybe this isn't necessary anymore?
+;; Need to edit some C++ code and see.
+;; (defadvice c-lineup-arglist (around my activate)
+;;   "Improve indentation of continued C++11 lambda function opened as argument."
+;;   (setq ad-return-value
+;;         (if (and (equal major-mode 'c++-mode)
+;;                  (ignore-errors
+;;                    (save-excursion
+;;                      (goto-char (c-langelem-pos langelem))
+;;                      ;; Detect "[...](" or "[...]{". preceded by "," or "(",
+;;                      ;;   and with unclosed brace.
+;;                      (looking-at ".*[(,][ \t]*\\[[^]]*\\][ \t]*[({][^}]*$"))))
+;;             0                           ; no additional indent
+;;           ad-do-it)))                   ; default behavior
 
 ; I haven't found a good editing mode for arbitrary XML.  sgml-mode
 ; appears to require DTDs or something.  I don't want or need a
@@ -658,15 +662,14 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
- '(c-offsets-alist (quote ((innamespace . 0))))
+ '(c-offsets-alist '((innamespace . 0)))
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
  '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
-   (quote
-    ((mark modified read-only " "
+   '((mark modified read-only " "
            (name 32 32 :left :elide)
            " "
            (size 9 -1 :right)
@@ -675,24 +678,21 @@ Major Mode for editing ML-Yacc files." t nil)
            " " filename-and-process)
      (mark " "
            (name 16 -1)
-           " " filename))))
+           " " filename)))
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
  '(octave-block-offset 4)
  '(package-archives
-   (quote
-    (("gnu" . "https://elpa.gnu.org/packages/")
-     ("melpa" . "https://melpa.org/packages/"))))
+   '(("gnu" . "https://elpa.gnu.org/packages/")
+     ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   (quote
-    (adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)))
+   '(magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
-   (quote
-    ((buffer-file-coding-system . utf-8-dos)
-     (css-indent-offset . 2))))
- '(scroll-bar-mode (quote right))
+   '((buffer-file-coding-system . utf-8-dos)
+     (css-indent-offset . 2)))
+ '(scroll-bar-mode 'right)
  '(show-trailing-whitespace t)
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
@@ -703,8 +703,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(web-mode-script-padding 0)
  '(web-mode-style-padding 4)
  '(whitespace-style
-   (quote
-    (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
+   '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
 
 (when window-system
   (cond ((eq window-system 'ns)
@@ -765,3 +764,18 @@ Major Mode for editing ML-Yacc files." t nil)
 (put 'scroll-left 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Menlo" :height 110))))
+ '(font-lock-comment-face ((t (:foreground "#997777"))))
+ '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
+ '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
+ '(font-lock-string-face ((t (:foreground "#338300"))))
+ '(font-lock-type-face ((t (:foreground "#665500"))))
+ '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
+ '(helm-ls-git-modified-not-staged-face ((t (:foreground "yellow4"))))
+ '(mode-line ((t (:background "#e5e5e5" :box nil))))
+ '(trailing-whitespace ((t (:background "gray95")))))
