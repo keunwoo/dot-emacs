@@ -273,11 +273,12 @@
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
 
-;; go-mode
-(setq gofmt-command "goimports")
-(add-hook 'go-mode-hook
-          (lambda () (interactive) 
-            (column-marker-1 100)))
+;;; go-mode
+;; Need to update these...
+;;(setq gofmt-command "goimports")
+;;(add-hook 'go-mode-hook
+;;          (lambda () (interactive)
+;;            (column-marker-1 100)))
 (defun auto-complete-for-go () (auto-complete-mode 1))
 (add-hook 'after-init-hook
           (lambda ()
@@ -358,6 +359,40 @@
 ;; Markdown mode
 (assoc "\\.md$" auto-mode-alist)
 
+;; Typescript
+;; (require 'use-package)
+;; (defun setup-tide-mode ()
+;;   (interactive)
+;;   (tide-setup)
+;;   (flycheck-mode +1)
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;   (eldoc-mode +1)
+;;   (tide-hl-identifier-mode +1)
+;;   (company-mode +1))
+;; (add-hook 'typescript-mode-hook #'setup-tide-mode)
+;; (use-package tide
+;;   :ensure t
+;;   :config
+;;   (progn
+;;     (company-mode +1)
+;;     ;; aligns annotation to the right hand side
+;;     (setq company-tooltip-align-annotations t)
+;;     (add-hook 'typescript-mode-hook #'setup-tide-mode)
+;;     ;; This is way too slow.
+;;     ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
+;;     (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+;;   ))
+;; (defun my-tide-tsserver-locator ()
+;;   "Locate the nearest relevant tsserver."
+;;   (or
+;;    ;; I don't know why tide doesn't do this by default.  Maybe I should send a PR.
+;;    (let ((typescript-dir (concat
+;;                           (locate-dominating-file default-directory "node_modules/typescript")
+;;                           "node_modules/typescript/lib/")))
+;;      (tide--locate-tsserver typescript-dir))
+;;    ;; Fall back to tide's default locator function.
+;;    (tide-tscompiler-locater-npmlocal-projectile-npmglobal)))
+
 ;;; Use web-mode for html-like files.
 (add-hook 'after-init-hook
           (lambda ()
@@ -367,9 +402,13 @@
             (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
             (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
             (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-            (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
+            (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode)))
+            (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
+  ;; Enable tide in tsx files.
+  (when (string-equal "tsx" (file-name-extension buffer-file-name))
+    (setup-tide-mode))
   ;; Don't line up indents in various situations; standard indent is fine.
   (mapc
    (lambda (indent-situation)
@@ -501,6 +540,7 @@ Major Mode for editing ML-Yacc files." t nil)
 (add-hook 'c++-mode-hook
           '(lambda ()
              (setq ps-print-color-p 't)))
+;; TODO(keunwoo): implement the new way to do this in Emacs 26.3 and up...
 ;; From https://stackoverflow.com/questions/23553881/emacs-indenting-of-c11-lambda-functions-cc-mode
 ;; It is embarrassing that this is necessary.
 ;; Update to emacs 27: maybe this isn't necessary anymore?
@@ -686,14 +726,23 @@ Major Mode for editing ML-Yacc files." t nil)
  '(package-archives
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
+ '(ps-print-header-frame nil)
  '(package-selected-packages
-   '(magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git))
+   '(magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)
+   ;; TODO(keunwoo): merge the packages below once I get use-package straightened out
+   ;; (use-package company tide magit rust-mode web-mode adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)   
+   )
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
-   '((buffer-file-coding-system . utf-8-dos)
+   '((eval rename-buffer "*notes*")
+     (buffer-file-coding-system . utf-8-dos)
      (css-indent-offset . 2)))
  '(scroll-bar-mode 'right)
  '(show-trailing-whitespace t)
+ '(tide-node-executable "/Users/keunwoo/bin/node-activated")
+ '(tide-sync-request-timeout 5)
+ '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
+ '(tide-tsserver-process-environment nil)
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
