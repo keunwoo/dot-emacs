@@ -69,6 +69,13 @@
             ;; Find within current repo using helm.
             (global-set-key (kbd "C-c f") 'helm-ls-git-ls)))
 
+;;; Configure git
+(add-hook 'after-init-hook
+          (lambda ()
+            (require 'magit nil t)
+            (global-set-key (kbd "C-x g") 'magit-status)
+            ))
+
 ;;;;;;;;;;;;;;;;;;;;;;; DISPLAY ;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; That splash screen is idiotic.
@@ -360,38 +367,39 @@
 (assoc "\\.md$" auto-mode-alist)
 
 ;; Typescript
-;; (require 'use-package)
-;; (defun setup-tide-mode ()
-;;   (interactive)
-;;   (tide-setup)
-;;   (flycheck-mode +1)
-;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;   (eldoc-mode +1)
-;;   (tide-hl-identifier-mode +1)
-;;   (company-mode +1))
-;; (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;; (use-package tide
-;;   :ensure t
-;;   :config
-;;   (progn
-;;     (company-mode +1)
-;;     ;; aligns annotation to the right hand side
-;;     (setq company-tooltip-align-annotations t)
-;;     (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;;     ;; This is way too slow.
-;;     ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
-;;     (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-;;   ))
-;; (defun my-tide-tsserver-locator ()
-;;   "Locate the nearest relevant tsserver."
-;;   (or
-;;    ;; I don't know why tide doesn't do this by default.  Maybe I should send a PR.
-;;    (let ((typescript-dir (concat
-;;                           (locate-dominating-file default-directory "node_modules/typescript")
-;;                           "node_modules/typescript/lib/")))
-;;      (tide--locate-tsserver typescript-dir))
-;;    ;; Fall back to tide's default locator function.
-;;    (tide-tscompiler-locater-npmlocal-projectile-npmglobal)))
+(require 'use-package)
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(use-package tide
+  :ensure t
+  :config
+  (progn
+    (company-mode +1)
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    ;; This is way too slow.
+    ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
+    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  ))
+(defun my-tide-tsserver-locator ()
+  "Locate the nearest relevant tsserver."
+  (or
+   ;; I don't know why tide doesn't do this by default.  Maybe I should send a PR.
+   (let ((typescript-dir (concat
+                          (locate-dominating-file default-directory ".git")
+                          ;; (locate-dominating-file default-directory "node_modules/typescript")
+                          "node_modules/typescript/lib/")))
+     (tide--locate-tsserver typescript-dir))
+   ;; Fall back to tide's default locator function.
+   (tide-tscompiler-locater-npmlocal-projectile-npmglobal)))
 
 ;;; Use web-mode for html-like files.
 (add-hook 'after-init-hook
@@ -408,7 +416,8 @@
   "Hooks for Web mode."
   ;; Enable tide in tsx files.
   (when (string-equal "tsx" (file-name-extension buffer-file-name))
-    (setup-tide-mode))
+    (setup-tide-mode)
+    (column-enforce-mode))
   ;; Don't line up indents in various situations; standard indent is fine.
   (mapc
    (lambda (indent-situation)
@@ -703,6 +712,7 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(c-offsets-alist '((innamespace . 0)))
+ '(column-enforce-column 100)
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
@@ -722,16 +732,17 @@ Major Mode for editing ML-Yacc files." t nil)
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
+ '(magit-refs-sections-hook
+   (quote
+    (magit-insert-error-header magit-insert-branch-description magit-insert-local-branches)))
  '(octave-block-offset 4)
  '(package-archives
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(ps-print-header-frame nil)
  '(package-selected-packages
-   '(magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)
-   ;; TODO(keunwoo): merge the packages below once I get use-package straightened out
-   ;; (use-package company tide magit rust-mode web-mode adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)   
-   )
+   '(adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
+ '(prettier-js-command "/Users/keunwoo/bin/run-prettier")
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    '((eval rename-buffer "*notes*")
@@ -743,6 +754,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(tide-sync-request-timeout 5)
  '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
  '(tide-tsserver-process-environment nil)
+ '(tide-tsserver-process-environment '("NODE_OPTIONS='--max_old_space_size=8000'"))
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
@@ -819,6 +831,9 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Menlo" :height 110))))
+ '(column-enforce-face ((t (:inherit nil :underline "#966"))))
+ '(flycheck-error ((t (:underline "orchid3"))))
+ '(flycheck-info ((t (:underline "ForestGreen"))))
  '(font-lock-comment-face ((t (:foreground "#997777"))))
  '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
  '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
