@@ -702,14 +702,15 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
- '(c-offsets-alist '((innamespace . 0)))
+ '(c-offsets-alist (quote ((innamespace . 0))))
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
  '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
-   '((mark modified read-only " "
+   (quote
+    ((mark modified read-only " "
            (name 32 32 :left :elide)
            " "
            (size 9 -1 :right)
@@ -718,30 +719,29 @@ Major Mode for editing ML-Yacc files." t nil)
            " " filename-and-process)
      (mark " "
            (name 16 -1)
-           " " filename)))
+           " " filename))))
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
  '(octave-block-offset 4)
  '(package-archives
-   '(("gnu" . "https://elpa.gnu.org/packages/")
-     ("melpa" . "https://melpa.org/packages/")))
- '(ps-print-header-frame nil)
+   (quote
+    (("gnu" . "https://elpa.gnu.org/packages/")
+     ("melpa" . "https://melpa.org/packages/"))))
  '(package-selected-packages
-   '(magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)
-   ;; TODO(keunwoo): merge the packages below once I get use-package straightened out
-   ;; (use-package company tide magit rust-mode web-mode adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)   
-   )
+   (quote
+    (magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
-   '((eval rename-buffer "*notes*")
+   (quote
+    ((eval rename-buffer "*notes*")
      (buffer-file-coding-system . utf-8-dos)
-     (css-indent-offset . 2)))
- '(scroll-bar-mode 'right)
+     (css-indent-offset . 2))))
+ '(scroll-bar-mode (quote right))
  '(show-trailing-whitespace t)
  '(tide-node-executable "/Users/keunwoo/bin/node-activated")
  '(tide-sync-request-timeout 5)
- '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
+ '(tide-tsserver-locator-function (quote my-tide-tsserver-locator))
  '(tide-tsserver-process-environment nil)
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
@@ -752,7 +752,8 @@ Major Mode for editing ML-Yacc files." t nil)
  '(web-mode-script-padding 0)
  '(web-mode-style-padding 4)
  '(whitespace-style
-   '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
+   (quote
+    (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
 
 (when window-system
   (cond ((eq window-system 'ns)
@@ -776,7 +777,9 @@ Major Mode for editing ML-Yacc files." t nil)
 
         (t
          (custom-set-faces
-          '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))))
+          ;; Currently this is ok for ChromeOS/Crostini.
+          ;; If I ever go back to a proper Linux desktop, we'll have to edit this.
+          '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 80 :width normal :foundry "GOOG" :family "Noto Mono"))))))))
 
 ;; A color scheme that's less obtrusive than the Emacs default.
 ;; Guarded with window-system because many terminals render subtle colors badly.
@@ -818,7 +821,6 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Menlo" :height 110))))
  '(font-lock-comment-face ((t (:foreground "#997777"))))
  '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
  '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
