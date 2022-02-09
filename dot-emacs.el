@@ -609,66 +609,89 @@ Major Mode for editing ML-Yacc files." t nil)
    "%Y-%m-%d %H:%M:%S"
    (seconds-to-time (/ (string-to-number hex-string) 1000000.0))))
 
-;;; Extracts list of paths specified in ~/.profile.
+;;; Extracts path extension from PATH=...:$PATH lines in shell scripts.
 ;;; TODO(keunwoo): dedupe entries in paths.
 ;;; TODO(keunwoo): make this work on Windows
-;; XXX-TODO: extract below into function
-;; XXX-TODO: add another function that extracts paths from /etc/paths{,.d}
-;;(defun exec-path-from-profile (
-(if (not (eq system-type 'windows-nt))
-    (let*
-        ((strip
-          ;; Strips down a .profile line of the following form:
-          ;;   export PATH=foo:bar:baz  # optional comment
-          ;; or
-          ;;   PATH=foo:bar:baz  # another comment
-          ;; removing leading/trailing whitespace, and the leading
-          ;; "export" and "PATH=", to produce just
-          ;;   foo:bar:baz
-          (lambda (s)
-            (let* ((s (replace-regexp-in-string "#.*$" "" s 't 't))
-                   (s (replace-regexp-in-string
-                       "^\\(export \\)?PATH=" "" s 't 't))
-                   (s (replace-regexp-in-string
-                       "^[ \t\n]*\\([^ \t\n].*\\)$" "\\1" s 't nil))
-                   (s (replace-regexp-in-string
-                       "^\\(.*[^ \t\n]\\)[ \t\n]*$" "\\1" s 't nil)))
-              s)))
+;;; TODO(keunwoo): add another function that extracts paths from /etc/paths{,.d}
+(defun path-extensions-from-shell-script (shell-script-path)
+    (if (eq system-type 'windows-nt)
+        nil
+      (let*
+          ((strip
+            ;; Strips down a .profile line of the following form:
+            ;;   export PATH=foo:bar:baz  # optional comment
+            ;; or
+            ;;   PATH=foo:bar:baz  # another comment
+            ;; removing leading/trailing whitespace, and the leading
+            ;; "export" and "PATH=", to produce just
+            ;;   foo:bar:baz
+            (lambda (s)
+              (let* (
+                     ;; strip comments
+                     (s (replace-regexp-in-string "#.*$" "" s 't 't))
+                     ;; strip PATH=
+                     (s (replace-regexp-in-string
+                         "^[ \t\n]*\\(export \\)?PATH=" "" s 't 't))
+                     ;; strip leading & trailing quote & whitespace
+                     (s (replace-regexp-in-string
+                         "^[ \t\n]*\"?\\([^ \t\n\"]*\\)\"?[ \t\n]*$" "\\1" s 't nil)))
+                s)))
 
-         ;; Extract "PATH=" or "export PATH=" lines from .profile.
-         (profile-paths
-          (let ((temp-buffer (generate-new-buffer "*path-grep*")))
-            (unwind-protect
-                (progn
-                  (call-process "grep" nil temp-buffer nil
-                                "-E"
-                                "^(export )?PATH="
-                                (concat (getenv "HOME") "/.profile"))
-                  (with-current-buffer temp-buffer
-                    (mapcar (lambda (s) (funcall strip s))
-                            (delete "" (split-string (buffer-string) "\n")))))
-              (kill-buffer temp-buffer))))
+           ;; Extract "PATH=" or "export PATH=" lines from file.
+           (path-extensions
+            (let ((temp-buffer (generate-new-buffer "*path-grep*")))
+              (unwind-protect
+                  (progn
+                    (call-process "grep" nil temp-buffer nil
+                                  "-E"
+                                  "^[[:space:]]*(export )?PATH="
+                                  shell-script-path)
+                    (with-current-buffer temp-buffer
+                      (mapcar (lambda (s) (funcall strip s))
+                              (delete "" (split-string (buffer-string) "\n")))))
+                (kill-buffer temp-buffer))))
 
-         ;; Expand $HOME/foo/bar, replacing HOME with its value.
-         (profile-paths-expanded
-          (let ((home (getenv "HOME")))
-            (mapcar (lambda (line)
-                      (replace-regexp-in-string "[$]{?HOME}?" home line 't 't))
-                    profile-paths)))
+           ;; Expand $HOME/foo/bar, replacing HOME with its value.
+           (expanded-path-extensions
+            (let ((home (getenv "HOME")))
+              (mapcar (lambda (line)
+                        (replace-regexp-in-string "[$]{?HOME}?" home line 't 't))
+                      path-extensions))))
 
-         (current-path (getenv "PATH")))
+        expanded-path-extensions)))
 
-      ;; Substitutes PATH sequentially at the appropriate part in each
-      ;; subsequent declaration.
-      (dolist (profile-path profile-paths-expanded)
-        (setq current-path
-              (replace-regexp-in-string "[$]{?PATH}?" current-path profile-path
-                                        't 't)))
+;; Given path extension expressions extracted by path-extensions-from-shell-script,
+;; returns the final path resulting from extending the current path.
+(defun extend-executable-path (path-extensions)
+    (let* ((current-path (getenv "PATH")))
+      (progn
+        ;; Substitutes PATH sequentially at the appropriate part in each
+        ;; subsequent declaration.
+        (dolist (extension path-extensions)
+          (setq current-path
+                (replace-regexp-in-string "[$]{?PATH}?" current-path extension
+                                          't 't)))
+        current-path)))
 
-      ;; Return final, concatenated/expanded path.
-      (setenv "PATH" current-path)
-      (set-variable 'exec-path (split-string (getenv "PATH") ":")))
-  )
+;; Update PATH based on the path extension expressions parsed from paths,
+;; which is a list of homedir-relative paths.
+(defun extend-executable-path-from-homedir-paths (paths)
+  (let* ((home (getenv "HOME"))
+         (path-extensions-from-homedir
+          (lambda (file-name)
+            (let ((file-path (concat home "/" file-name)))
+              (if (file-exists-p file-path)
+                  (path-extensions-from-shell-script file-path)
+                nil))))
+         (all-path-extensions (mapcar path-extensions-from-homedir paths))
+         (flattened-path-extensions (apply 'append all-path-extensions))
+         (updated-path (extend-executable-path flattened-path-extensions)))
+    (progn
+      (setenv "PATH" updated-path)
+      (set-variable 'exec-path (split-string (getenv "PATH") ":"))
+      updated-path)))
+
+(extend-executable-path-from-homedir-paths '(".profile" ".cargo/env"))
 
 ;; Try valiantly to make Windows a semi-acceptable dev environment.
 (if (eq system-type 'windows-nt)
