@@ -618,66 +618,89 @@ Major Mode for editing ML-Yacc files." t nil)
    "%Y-%m-%d %H:%M:%S"
    (seconds-to-time (/ (string-to-number hex-string) 1000000.0))))
 
-;;; Extracts list of paths specified in ~/.profile.
+;;; Extracts path extension from PATH=...:$PATH lines in shell scripts.
 ;;; TODO(keunwoo): dedupe entries in paths.
 ;;; TODO(keunwoo): make this work on Windows
-;; XXX-TODO: extract below into function
-;; XXX-TODO: add another function that extracts paths from /etc/paths{,.d}
-;;(defun exec-path-from-profile (
-(if (not (eq system-type 'windows-nt))
-    (let*
-        ((strip
-          ;; Strips down a .profile line of the following form:
-          ;;   export PATH=foo:bar:baz  # optional comment
-          ;; or
-          ;;   PATH=foo:bar:baz  # another comment
-          ;; removing leading/trailing whitespace, and the leading
-          ;; "export" and "PATH=", to produce just
-          ;;   foo:bar:baz
-          (lambda (s)
-            (let* ((s (replace-regexp-in-string "#.*$" "" s 't 't))
-                   (s (replace-regexp-in-string
-                       "^\\(export \\)?PATH=" "" s 't 't))
-                   (s (replace-regexp-in-string
-                       "^[ \t\n]*\\([^ \t\n].*\\)$" "\\1" s 't nil))
-                   (s (replace-regexp-in-string
-                       "^\\(.*[^ \t\n]\\)[ \t\n]*$" "\\1" s 't nil)))
-              s)))
+;;; TODO(keunwoo): add another function that extracts paths from /etc/paths{,.d}
+(defun path-extensions-from-shell-script (shell-script-path)
+    (if (eq system-type 'windows-nt)
+        nil
+      (let*
+          ((strip
+            ;; Strips down a .profile line of the following form:
+            ;;   export PATH=foo:bar:baz  # optional comment
+            ;; or
+            ;;   PATH=foo:bar:baz  # another comment
+            ;; removing leading/trailing whitespace, and the leading
+            ;; "export" and "PATH=", to produce just
+            ;;   foo:bar:baz
+            (lambda (s)
+              (let* (
+                     ;; strip comments
+                     (s (replace-regexp-in-string "#.*$" "" s 't 't))
+                     ;; strip PATH=
+                     (s (replace-regexp-in-string
+                         "^[ \t\n]*\\(export \\)?PATH=" "" s 't 't))
+                     ;; strip leading & trailing quote & whitespace
+                     (s (replace-regexp-in-string
+                         "^[ \t\n]*\"?\\([^ \t\n\"]*\\)\"?[ \t\n]*$" "\\1" s 't nil)))
+                s)))
 
-         ;; Extract "PATH=" or "export PATH=" lines from .profile.
-         (profile-paths
-          (let ((temp-buffer (generate-new-buffer "*path-grep*")))
-            (unwind-protect
-                (progn
-                  (call-process "grep" nil temp-buffer nil
-                                "-E"
-                                "^(export )?PATH="
-                                (concat (getenv "HOME") "/.profile"))
-                  (with-current-buffer temp-buffer
-                    (mapcar (lambda (s) (funcall strip s))
-                            (delete "" (split-string (buffer-string) "\n")))))
-              (kill-buffer temp-buffer))))
+           ;; Extract "PATH=" or "export PATH=" lines from file.
+           (path-extensions
+            (let ((temp-buffer (generate-new-buffer "*path-grep*")))
+              (unwind-protect
+                  (progn
+                    (call-process "grep" nil temp-buffer nil
+                                  "-E"
+                                  "^[[:space:]]*(export )?PATH="
+                                  shell-script-path)
+                    (with-current-buffer temp-buffer
+                      (mapcar (lambda (s) (funcall strip s))
+                              (delete "" (split-string (buffer-string) "\n")))))
+                (kill-buffer temp-buffer))))
 
-         ;; Expand $HOME/foo/bar, replacing HOME with its value.
-         (profile-paths-expanded
-          (let ((home (getenv "HOME")))
-            (mapcar (lambda (line)
-                      (replace-regexp-in-string "[$]{?HOME}?" home line 't 't))
-                    profile-paths)))
+           ;; Expand $HOME/foo/bar, replacing HOME with its value.
+           (expanded-path-extensions
+            (let ((home (getenv "HOME")))
+              (mapcar (lambda (line)
+                        (replace-regexp-in-string "[$]{?HOME}?" home line 't 't))
+                      path-extensions))))
 
-         (current-path (getenv "PATH")))
+        expanded-path-extensions)))
 
-      ;; Substitutes PATH sequentially at the appropriate part in each
-      ;; subsequent declaration.
-      (dolist (profile-path profile-paths-expanded)
-        (setq current-path
-              (replace-regexp-in-string "[$]{?PATH}?" current-path profile-path
-                                        't 't)))
+;; Given path extension expressions extracted by path-extensions-from-shell-script,
+;; returns the final path resulting from extending the current path.
+(defun extend-executable-path (path-extensions)
+    (let* ((current-path (getenv "PATH")))
+      (progn
+        ;; Substitutes PATH sequentially at the appropriate part in each
+        ;; subsequent declaration.
+        (dolist (extension path-extensions)
+          (setq current-path
+                (replace-regexp-in-string "[$]{?PATH}?" current-path extension
+                                          't 't)))
+        current-path)))
 
-      ;; Return final, concatenated/expanded path.
-      (setenv "PATH" current-path)
-      (set-variable 'exec-path (split-string (getenv "PATH") ":")))
-  )
+;; Update PATH based on the path extension expressions parsed from paths,
+;; which is a list of homedir-relative paths.
+(defun extend-executable-path-from-homedir-paths (paths)
+  (let* ((home (getenv "HOME"))
+         (path-extensions-from-homedir
+          (lambda (file-name)
+            (let ((file-path (concat home "/" file-name)))
+              (if (file-exists-p file-path)
+                  (path-extensions-from-shell-script file-path)
+                nil))))
+         (all-path-extensions (mapcar path-extensions-from-homedir paths))
+         (flattened-path-extensions (apply 'append all-path-extensions))
+         (updated-path (extend-executable-path flattened-path-extensions)))
+    (progn
+      (setenv "PATH" updated-path)
+      (set-variable 'exec-path (split-string (getenv "PATH") ":"))
+      updated-path)))
+
+(extend-executable-path-from-homedir-paths '(".profile" ".cargo/env"))
 
 ;; Try valiantly to make Windows a semi-acceptable dev environment.
 (if (eq system-type 'windows-nt)
@@ -711,15 +734,15 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
- '(c-offsets-alist '((innamespace . 0)))
- '(column-enforce-column 100)
+ '(c-offsets-alist (quote ((innamespace . 0))))
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
  '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
-   '((mark modified read-only " "
+   (quote
+    ((mark modified read-only " "
            (name 32 32 :left :elide)
            " "
            (size 9 -1 :right)
@@ -728,7 +751,7 @@ Major Mode for editing ML-Yacc files." t nil)
            " " filename-and-process)
      (mark " "
            (name 16 -1)
-           " " filename)))
+           " " filename))))
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
@@ -737,22 +760,23 @@ Major Mode for editing ML-Yacc files." t nil)
     (magit-insert-error-header magit-insert-branch-description magit-insert-local-branches)))
  '(octave-block-offset 4)
  '(package-archives
-   '(("gnu" . "https://elpa.gnu.org/packages/")
-     ("melpa" . "https://melpa.org/packages/")))
- '(ps-print-header-frame nil)
+   (quote
+    (("gnu" . "https://elpa.gnu.org/packages/")
+     ("melpa" . "https://melpa.org/packages/"))))
  '(package-selected-packages
    '(adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
  '(prettier-js-command "/Users/keunwoo/bin/run-prettier")
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
-   '((eval rename-buffer "*notes*")
+   (quote
+    ((eval rename-buffer "*notes*")
      (buffer-file-coding-system . utf-8-dos)
-     (css-indent-offset . 2)))
- '(scroll-bar-mode 'right)
+     (css-indent-offset . 2))))
+ '(scroll-bar-mode (quote right))
  '(show-trailing-whitespace t)
  '(tide-node-executable "/Users/keunwoo/bin/node-activated")
  '(tide-sync-request-timeout 5)
- '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
+ '(tide-tsserver-locator-function (quote my-tide-tsserver-locator))
  '(tide-tsserver-process-environment nil)
  '(tide-tsserver-process-environment '("NODE_OPTIONS='--max_old_space_size=8000'"))
  '(tool-bar-mode nil)
@@ -764,7 +788,8 @@ Major Mode for editing ML-Yacc files." t nil)
  '(web-mode-script-padding 0)
  '(web-mode-style-padding 4)
  '(whitespace-style
-   '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
+   (quote
+    (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
 
 (when window-system
   (cond ((eq window-system 'ns)
@@ -788,13 +813,17 @@ Major Mode for editing ML-Yacc files." t nil)
 
         (t
          (custom-set-faces
-          '(default ((t (:inherit nil :stipple nil :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))))))
+          ;; Currently this is ok for ChromeOS/Crostini.
+          ;; If I ever go back to a proper Linux desktop, we'll have to edit this.
+          '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 80 :width normal :foundry "GOOG" :family "Noto Mono"))))))))
 
 ;; A color scheme that's less obtrusive than the Emacs default.
 ;; Guarded with window-system because many terminals render subtle colors badly.
 (if window-system
   (custom-set-faces
-   ;; '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   '(column-enforce-face ((t (:inherit nil :underline "#966"))))
+   '(flycheck-error ((t (:underline "orchid3"))))
+   '(flycheck-info ((t (:underline "ForestGreen"))))
    '(font-lock-comment-face ((t (:foreground "#997777"))))
    '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
    '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
@@ -817,29 +846,6 @@ Major Mode for editing ML-Yacc files." t nil)
    '(whitespace-tab ((t (:foreground "yellow")))))
   )
 
-;; Some faces we set unconditionally.
-;; not sure I like this...
-;;(custom-set-faces
-;;  '(trailing-whitespace ((t (:underline "#e3e3e3")))))
-
 (put 'scroll-left 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "Menlo" :height 110))))
- '(column-enforce-face ((t (:inherit nil :underline "#966"))))
- '(flycheck-error ((t (:underline "orchid3"))))
- '(flycheck-info ((t (:underline "ForestGreen"))))
- '(font-lock-comment-face ((t (:foreground "#997777"))))
- '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
- '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
- '(font-lock-string-face ((t (:foreground "#338300"))))
- '(font-lock-type-face ((t (:foreground "#665500"))))
- '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
- '(helm-ls-git-modified-not-staged-face ((t (:foreground "yellow4"))))
- '(mode-line ((t (:background "#e5e5e5" :box nil))))
- '(trailing-whitespace ((t (:background "gray95")))))
