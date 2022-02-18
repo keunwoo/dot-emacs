@@ -734,15 +734,15 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
- '(c-offsets-alist (quote ((innamespace . 0))))
+ '(c-offsets-alist '((innamespace . 0)))
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
+ '(explicit-shell-file-name "/bin/bash")
  '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
-   (quote
-    ((mark modified read-only " "
+   '((mark modified read-only " "
            (name 32 32 :left :elide)
            " "
            (size 9 -1 :right)
@@ -751,33 +751,29 @@ Major Mode for editing ML-Yacc files." t nil)
            " " filename-and-process)
      (mark " "
            (name 16 -1)
-           " " filename))))
+           " " filename)))
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
  '(magit-refs-sections-hook
-   (quote
-    (magit-insert-error-header magit-insert-branch-description magit-insert-local-branches)))
+   '(magit-insert-error-header magit-insert-branch-description magit-insert-local-branches))
  '(octave-block-offset 4)
  '(package-archives
-   (quote
-    (("gnu" . "https://elpa.gnu.org/packages/")
-     ("melpa" . "https://melpa.org/packages/"))))
+   '(("gnu" . "https://elpa.gnu.org/packages/")
+     ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
    '(adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
  '(prettier-js-command "/Users/keunwoo/bin/run-prettier")
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
-   (quote
-    ((eval rename-buffer "*notes*")
+   '((eval rename-buffer "*notes*")
      (buffer-file-coding-system . utf-8-dos)
-     (css-indent-offset . 2))))
- '(scroll-bar-mode (quote right))
+     (css-indent-offset . 2)))
+ '(scroll-bar-mode 'right)
  '(show-trailing-whitespace t)
  '(tide-node-executable "/Users/keunwoo/bin/node-activated")
  '(tide-sync-request-timeout 5)
- '(tide-tsserver-locator-function (quote my-tide-tsserver-locator))
- '(tide-tsserver-process-environment nil)
+ '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
  '(tide-tsserver-process-environment '("NODE_OPTIONS='--max_old_space_size=8000'"))
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
@@ -788,8 +784,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(web-mode-script-padding 0)
  '(web-mode-style-padding 4)
  '(whitespace-style
-   (quote
-    (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
+   '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
 
 (when window-system
   (cond ((eq window-system 'ns)
