@@ -368,6 +368,8 @@
 
 ;; Typescript
 (require 'use-package)
+(defun tide-project-root ()
+  (locate-dominating-file default-directory ".git"))
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
