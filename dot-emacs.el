@@ -69,6 +69,13 @@
             ;; Find within current repo using helm.
             (global-set-key (kbd "C-c f") 'helm-ls-git-ls)))
 
+;;; Configure git
+(add-hook 'after-init-hook
+          (lambda ()
+            (require 'magit nil t)
+            (global-set-key (kbd "C-x g") 'magit-status)
+            ))
+
 ;;;;;;;;;;;;;;;;;;;;;;; DISPLAY ;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; That splash screen is idiotic.
@@ -361,6 +368,8 @@
 
 ;; Typescript
 (require 'use-package)
+(defun tide-project-root ()
+  (locate-dominating-file default-directory ".git"))
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
@@ -387,7 +396,7 @@
   (or
    ;; I don't know why tide doesn't do this by default.  Maybe I should send a PR.
    (let ((typescript-dir (concat
-                          (locate-dominating-file default-directory "node_modules/typescript")
+                          (locate-dominating-file default-directory ".git")
                           "node_modules/typescript/lib/")))
      (tide--locate-tsserver typescript-dir))
    ;; Fall back to tide's default locator function.
@@ -408,7 +417,8 @@
   "Hooks for Web mode."
   ;; Enable tide in tsx files.
   (when (string-equal "tsx" (file-name-extension buffer-file-name))
-    (setup-tide-mode))
+    (setup-tide-mode)
+    (column-enforce-mode))
   ;; Don't line up indents in various situations; standard indent is fine.
   (mapc
    (lambda (indent-situation)
@@ -729,6 +739,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
+ '(explicit-shell-file-name "/bin/bash")
  '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
@@ -745,12 +756,15 @@ Major Mode for editing ML-Yacc files." t nil)
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
+ '(magit-refs-sections-hook
+   '(magit-insert-error-header magit-insert-branch-description magit-insert-local-branches))
  '(octave-block-offset 4)
  '(package-archives
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(company tide web-mode zig-mode typescript-mode lsp-mode use-package go-imports pandoc-mode rust-mode magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git))
+   '(adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
+ '(prettier-js-command "/Users/keunwoo/bin/run-prettier")
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    '((eval rename-buffer "*notes*")
@@ -761,7 +775,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(tide-node-executable "/Users/keunwoo/bin/node-activated")
  '(tide-sync-request-timeout 5)
  '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
- '(tide-tsserver-process-environment nil)
+ '(tide-tsserver-process-environment '("NODE_OPTIONS='--max_old_space_size=8000'"))
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
@@ -803,7 +817,9 @@ Major Mode for editing ML-Yacc files." t nil)
 ;; Guarded with window-system because many terminals render subtle colors badly.
 (if window-system
   (custom-set-faces
-   ;; '(font-lock-comment-face ((t (:foreground "#8b5a2b"))))
+   '(column-enforce-face ((t (:inherit nil :underline "#966"))))
+   '(flycheck-error ((t (:underline "orchid3"))))
+   '(flycheck-info ((t (:underline "ForestGreen"))))
    '(font-lock-comment-face ((t (:foreground "#997777"))))
    '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
    '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
@@ -825,11 +841,6 @@ Major Mode for editing ML-Yacc files." t nil)
    '(whitespace-indentation ((t (:foreground "firebrick"))))
    '(whitespace-tab ((t (:foreground "yellow")))))
   )
-
-;; Some faces we set unconditionally.
-;; not sure I like this...
-;;(custom-set-faces
-;;  '(trailing-whitespace ((t (:underline "#e3e3e3")))))
 
 (put 'scroll-left 'disabled nil)
 (put 'downcase-region 'disabled nil)
