@@ -360,38 +360,38 @@
 (assoc "\\.md$" auto-mode-alist)
 
 ;; Typescript
-;; (require 'use-package)
-;; (defun setup-tide-mode ()
-;;   (interactive)
-;;   (tide-setup)
-;;   (flycheck-mode +1)
-;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;   (eldoc-mode +1)
-;;   (tide-hl-identifier-mode +1)
-;;   (company-mode +1))
-;; (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;; (use-package tide
-;;   :ensure t
-;;   :config
-;;   (progn
-;;     (company-mode +1)
-;;     ;; aligns annotation to the right hand side
-;;     (setq company-tooltip-align-annotations t)
-;;     (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;;     ;; This is way too slow.
-;;     ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
-;;     (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-;;   ))
-;; (defun my-tide-tsserver-locator ()
-;;   "Locate the nearest relevant tsserver."
-;;   (or
-;;    ;; I don't know why tide doesn't do this by default.  Maybe I should send a PR.
-;;    (let ((typescript-dir (concat
-;;                           (locate-dominating-file default-directory "node_modules/typescript")
-;;                           "node_modules/typescript/lib/")))
-;;      (tide--locate-tsserver typescript-dir))
-;;    ;; Fall back to tide's default locator function.
-;;    (tide-tscompiler-locater-npmlocal-projectile-npmglobal)))
+(require 'use-package)
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(use-package tide
+  :ensure t
+  :config
+  (progn
+    (company-mode +1)
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    ;; This is way too slow.
+    ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
+    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  ))
+(defun my-tide-tsserver-locator ()
+  "Locate the nearest relevant tsserver."
+  (or
+   ;; I don't know why tide doesn't do this by default.  Maybe I should send a PR.
+   (let ((typescript-dir (concat
+                          (locate-dominating-file default-directory "node_modules/typescript")
+                          "node_modules/typescript/lib/")))
+     (tide--locate-tsserver typescript-dir))
+   ;; Fall back to tide's default locator function.
+   (tide-tscompiler-locater-npmlocal-projectile-npmglobal)))
 
 ;;; Use web-mode for html-like files.
 (add-hook 'after-init-hook
@@ -691,7 +691,7 @@ Major Mode for editing ML-Yacc files." t nil)
       (set-variable 'exec-path (split-string (getenv "PATH") ":"))
       updated-path)))
 
-(extend-executable-path-from-homedir-paths '(".profile" ".cargo/env"))
+(extend-executable-path-from-homedir-paths '(".bash_profile" ".profile" ".cargo/env"))
 
 ;; Try valiantly to make Windows a semi-acceptable dev environment.
 (if (eq system-type 'windows-nt)
@@ -725,15 +725,14 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
- '(c-offsets-alist (quote ((innamespace . 0))))
+ '(c-offsets-alist '((innamespace . +)))
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
  '(grep-command "grep -nHi ")
  '(ibuffer-enable t)
  '(ibuffer-formats
-   (quote
-    ((mark modified read-only " "
+   '((mark modified read-only " "
            (name 32 32 :left :elide)
            " "
            (size 9 -1 :right)
@@ -742,29 +741,26 @@ Major Mode for editing ML-Yacc files." t nil)
            " " filename-and-process)
      (mark " "
            (name 16 -1)
-           " " filename))))
+           " " filename)))
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
  '(octave-block-offset 4)
  '(package-archives
-   (quote
-    (("gnu" . "https://elpa.gnu.org/packages/")
-     ("melpa" . "https://melpa.org/packages/"))))
+   '(("gnu" . "https://elpa.gnu.org/packages/")
+     ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   (quote
-    (magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git)))
+   '(company tide web-mode zig-mode typescript-mode lsp-mode use-package go-imports pandoc-mode rust-mode magit adaptive-wrap go-mode swift-mode markdown-mode urlenc json-mode jsx-mode git-commit flycheck-flow js2-mode helm-ls-git))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
-   (quote
-    ((eval rename-buffer "*notes*")
+   '((eval rename-buffer "*notes*")
      (buffer-file-coding-system . utf-8-dos)
-     (css-indent-offset . 2))))
- '(scroll-bar-mode (quote right))
+     (css-indent-offset . 2)))
+ '(scroll-bar-mode 'right)
  '(show-trailing-whitespace t)
  '(tide-node-executable "/Users/keunwoo/bin/node-activated")
  '(tide-sync-request-timeout 5)
- '(tide-tsserver-locator-function (quote my-tide-tsserver-locator))
+ '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
  '(tide-tsserver-process-environment nil)
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
@@ -775,8 +771,7 @@ Major Mode for editing ML-Yacc files." t nil)
  '(web-mode-script-padding 0)
  '(web-mode-style-padding 4)
  '(whitespace-style
-   (quote
-    (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
+   '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
 
 (when window-system
   (cond ((eq window-system 'ns)
@@ -802,7 +797,7 @@ Major Mode for editing ML-Yacc files." t nil)
          (custom-set-faces
           ;; Currently this is ok for ChromeOS/Crostini.
           ;; If I ever go back to a proper Linux desktop, we'll have to edit this.
-          '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 80 :width normal :foundry "GOOG" :family "Noto Mono"))))))))
+          '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 90 :width normal :foundry "GOOG" :family "Noto Sans Mono"))))))))
 
 ;; A color scheme that's less obtrusive than the Emacs default.
 ;; Guarded with window-system because many terminals render subtle colors badly.
@@ -839,17 +834,3 @@ Major Mode for editing ML-Yacc files." t nil)
 (put 'scroll-left 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(font-lock-comment-face ((t (:foreground "#997777"))))
- '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
- '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
- '(font-lock-string-face ((t (:foreground "#338300"))))
- '(font-lock-type-face ((t (:foreground "#665500"))))
- '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
- '(helm-ls-git-modified-not-staged-face ((t (:foreground "yellow4"))))
- '(mode-line ((t (:background "#e5e5e5" :box nil))))
- '(trailing-whitespace ((t (:background "gray95")))))
