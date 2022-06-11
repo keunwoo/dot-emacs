@@ -68,5 +68,11 @@
  '(whitespace-style
    '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
 
+(setq tide-node-executable (concat (getenv "HOME") "/bin/node-activated"))
+(setq tide-tscompiler-executable (concat (getenv "HOME") "/lib/typescript/node_modules/typescript/bin/tsserver"))
+(setq tide-tsserver-executable (concat (getenv "HOME") "/lib/typescript/node_modules/typescript/bin/tsserver"))
+
+(setenv "DENO_INSTALL" (concat (getenv "HOME") "/.deno"))
+
 (custom-set-faces
  '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 90 :width normal :foundry "GOOG" :family "Noto Sans Mono")))))

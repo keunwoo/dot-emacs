@@ -336,6 +336,32 @@
 ;; Markdown mode
 (assoc "\\.md$" auto-mode-alist)
 
+;; Typescript
+(require 'use-package)
+(defun tide-project-root ()
+  (locate-dominating-file default-directory ".git"))
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(use-package tide
+  :ensure t
+  :config
+  (progn
+    (company-mode +1)
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    ;; This is way too slow.
+    ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
+    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  ))
+
 ;;; Use web-mode for html-like files.
 (add-hook 'after-init-hook
           (lambda ()
