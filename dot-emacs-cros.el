@@ -47,7 +47,7 @@
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
+   '(prettier-js adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode rust-mode swift-mode tide urlenc use-package web-mode))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    '((eval rename-buffer "*notes*")
@@ -68,11 +68,27 @@
  '(whitespace-style
    '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
 
-(setq tide-node-executable (concat (getenv "HOME") "/bin/node-activated"))
+(setq tide-node-executable (concat (getenv "HOME") "/bin/node"))
 (setq tide-tscompiler-executable (concat (getenv "HOME") "/lib/typescript/node_modules/typescript/bin/tsserver"))
 (setq tide-tsserver-executable (concat (getenv "HOME") "/lib/typescript/node_modules/typescript/bin/tsserver"))
 
 (setenv "DENO_INSTALL" (concat (getenv "HOME") "/.deno"))
 
 (custom-set-faces
- '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 90 :width normal :foundry "GOOG" :family "Noto Sans Mono")))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 90 :width normal :foundry "GOOG" :family "Noto Sans Mono"))))
+ '(column-enforce-face ((t (:inherit nil :underline "#966"))))
+ '(flycheck-error ((t (:underline "orchid3"))))
+ '(flycheck-info ((t (:underline "ForestGreen"))))
+ '(font-lock-comment-face ((t (:foreground "#997777"))))
+ '(font-lock-function-name-face ((t (:foreground "#0226cc"))))
+ '(font-lock-keyword-face ((t (:foreground "#8a0f00"))))
+ '(font-lock-string-face ((t (:foreground "#338300"))))
+ '(font-lock-type-face ((t (:foreground "#665500"))))
+ '(font-lock-variable-name-face ((t (:foreground "#4a708b"))))
+ '(helm-ls-git-modified-not-staged-face ((t (:foreground "yellow4"))))
+ '(mode-line ((t (:background "#e5e5e5" :box nil))))
+ '(trailing-whitespace ((t (:background "gray95")))))

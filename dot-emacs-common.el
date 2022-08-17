@@ -397,6 +397,8 @@
               (delete-trailing-whitespace)
               nil)))
 (add-hook 'web-mode-hook 'my-web-mode-hook)
+(require 'prettier-js)
+(add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;; CSS mode
 (add-hook 'css-mode-hook
