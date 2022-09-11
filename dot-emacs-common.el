@@ -362,6 +362,19 @@
     (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
   ))
 
+;; lsp-mode
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (type-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+
 ;;; Use web-mode for html-like files.
 (add-hook 'after-init-hook
           (lambda ()
@@ -377,8 +390,10 @@
   "Hooks for Web mode."
   ;; Enable tide in tsx files.
   (when (string-equal "tsx" (file-name-extension buffer-file-name))
-    (setup-tide-mode)
-    (column-enforce-mode))
+    ;; (setup-tide-mode)
+    (lsp)
+    (column-enforce-mode)
+    )
   ;; Don't line up indents in various situations; standard indent is fine.
   (mapc
    (lambda (indent-situation)

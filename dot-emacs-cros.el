@@ -47,7 +47,7 @@
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(prettier-js adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode rust-mode swift-mode tide urlenc use-package web-mode))
+   '(helm-lsp lsp-ui lsp-mode prettier-js adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode rust-mode swift-mode tide urlenc use-package web-mode))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    '((eval rename-buffer "*notes*")
