@@ -280,11 +280,13 @@
                 ))))
 
 ;; rust-mode
-(add-hook 'rust-mode-hook 
+(add-hook 'rust-mode-hook
           (lambda ()
             (interactive)
             (rust-enable-format-on-save)
-            (column-marker-1 99)))
+            ;; This looks terrible. I miss column-marker-1
+            ;; (display-fill-column-indicator-mode 't)
+            (lsp)))
 
 ;; js2-mode
 ;; TODO(keunwoo): Find a better mode that doesn't require cl (deprecated)

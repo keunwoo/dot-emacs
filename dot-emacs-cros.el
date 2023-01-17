@@ -40,6 +40,7 @@
  '(json-reformat:indent-width 2)
  '(longlines-show-hard-newlines nil)
  '(longlines-wrap-follows-window-size t)
+ '(lsp-lens-enable nil)
  '(magit-refs-sections-hook
    '(magit-insert-error-header magit-insert-branch-description magit-insert-local-branches))
  '(octave-block-offset 4)
