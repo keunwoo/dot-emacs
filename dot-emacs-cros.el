@@ -80,7 +80,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 56 :width normal :foundry "GOOG" :family "Noto Mono"))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 96 :width normal :foundry "GOOG" :family "Noto Mono"))))
  '(column-enforce-face ((t (:inherit nil :underline "#966"))))
  '(flycheck-error ((t (:underline "orchid3"))))
  '(flycheck-info ((t (:underline "ForestGreen"))))
