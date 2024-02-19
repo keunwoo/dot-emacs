@@ -3,6 +3,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;; PRELIMINARIES ;;;;;;;;;;;;;;;;;;;;
 
+;; As of 2024-02-19, emacs 29 warns on a lot of packages for things like
+;; "docstring over 80 characters"; silence it.
+(setq warning-minimum-level :error)
+
 ;; Added by Package.el.  This must come before configurations of installed packages.
 (if (fboundp 'package-initialize)
     (package-initialize))
@@ -48,7 +52,7 @@
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(helm-lsp lsp-ui lsp-mode prettier-js adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode rust-mode swift-mode tide urlenc use-package web-mode))
+   '(eglot helm-lsp lsp-ui lsp-mode prettier-js adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode rust-mode swift-mode tide urlenc use-package web-mode))
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    '((eval rename-buffer "*notes*")
@@ -70,8 +74,8 @@
    '(face tabs trailing space-before-tab empty space-after-tab tab-mark)))
 
 (setq tide-node-executable (concat (getenv "HOME") "/bin/node"))
-(setq tide-tscompiler-executable (concat (getenv "HOME") "/lib/typescript/node_modules/typescript/bin/tsserver"))
-(setq tide-tsserver-executable (concat (getenv "HOME") "/lib/typescript/node_modules/typescript/bin/tsserver"))
+(setq tide-tscompiler-executable (concat (getenv "HOME") "/.yarn/bin/tsc"))
+(setq tide-tsserver-executable (concat (getenv "HOME") "/.yarn/bin/tsserver"))
 
 (setenv "DENO_INSTALL" (concat (getenv "HOME") "/.deno"))
 
