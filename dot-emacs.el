@@ -1,14 +1,16 @@
 ;; -*- emacs-lisp -*-
 ;; Keunwoo Lee's .emacs file.
-;; Updated for GNU Emacs 24.5.1
+;; Updated for GNU Emacs 29.2
 
 ;;;;;;;;;;;;;;;;;;;;;; PRELIMINARIES ;;;;;;;;;;;;;;;;;;;;
 
 ;; Custom load paths
 
-;; Added by Package.el.  This must come before configurations of installed packages.
+(require 'package)
 (if (fboundp 'package-initialize)
     (package-initialize))
+
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 (cd (getenv "HOME"))
 (add-to-list 'load-path (concat (getenv "HOME") "/lib/emacs"))
@@ -67,7 +69,8 @@
             (global-set-key (kbd "C-c C-h") 'helm-command-prefix)
             (global-unset-key (kbd "C-x c"))
             ;; Find within current repo using helm.
-            (global-set-key (kbd "C-c f") 'helm-ls-git-ls)))
+            (global-set-key (kbd "C-c f") 'helm-browse-project)
+            ))
 
 ;;; Configure git
 (add-hook 'after-init-hook
@@ -276,6 +279,12 @@
 (if (or (< emacs-major-version 24)
         (and (eq emacs-major-version 24) (< emacs-minor-version 4)))
     (require 'longlines))
+
+(use-package lsp-mode
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (rust-mode . lsp)
+  :commands lsp)
 
 ;; todoo-mode is terrible.
 (add-to-list 'auto-mode-alist '("TODO$" . fundamental-mode))
@@ -736,6 +745,7 @@ Major Mode for editing ML-Yacc files." t nil)
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(c-offsets-alist '((innamespace . +)))
+ '(column-enforce-column 100)
  '(column-number-mode t)
  '(dired-use-ls-dired nil)
  '(elisp-cache-byte-compile-files t)
@@ -763,8 +773,8 @@ Major Mode for editing ML-Yacc files." t nil)
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
- '(prettier-js-command "/Users/keunwoo/bin/run-prettier")
+   '(treesit-auto string-inflection lsp-mode json-reformat adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
+ '(prettier-js-command "/Users/keunwoo/h/keunwoo/bin/run-prettier")
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
    '((eval rename-buffer "*notes*")
