@@ -377,8 +377,6 @@
 
 ;; Typescript
 (require 'use-package)
-(defun tide-project-root ()
-  (locate-dominating-file default-directory ".git"))
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
@@ -400,6 +398,8 @@
     ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
     (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
   ))
+(defun tide-project-root ()
+  (locate-dominating-file default-directory ".git"))
 (defun my-tide-tsserver-locator ()
   "Locate the nearest relevant tsserver."
   (or
