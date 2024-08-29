@@ -115,7 +115,6 @@
 (line-number-mode 1)
 (column-number-mode 1)
 
-;; (require 'column-marker)
 (add-hook 'java-mode-hook
           '(lambda ()
              ; (font-lock-set-up-width-warning 100)
@@ -293,8 +292,7 @@
 ;; Need to update these...
 ;;(setq gofmt-command "goimports")
 ;;(add-hook 'go-mode-hook
-;;          (lambda () (interactive)
-;;            (column-marker-1 100)))
+;;          (lambda () (interactive)))
 (defun auto-complete-for-go () (auto-complete-mode 1))
 (add-hook 'after-init-hook
           (lambda ()
@@ -310,11 +308,11 @@
                 ))))
 
 ;; rust-mode
-(add-hook 'rust-mode-hook 
+(add-hook 'rust-mode-hook
           (lambda ()
             (interactive)
             (rust-enable-format-on-save)
-            (column-marker-1 99)))
+            ))
 
 ;; js2-mode
 ;; TODO(keunwoo): Find a better mode that doesn't require cl (deprecated)
