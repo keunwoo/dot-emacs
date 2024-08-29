@@ -388,16 +388,36 @@
   :ensure t
   :config
   (progn
-    (company-mode +1)
     ;; aligns annotation to the right hand side
     (setq company-tooltip-align-annotations t)
     (add-hook 'typescript-mode-hook #'setup-tide-mode)
     ;; This is way too slow.
     ;; (add-hook 'before-save-hook 'tide-format-before-save) ; formats the buffer before saving
-    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-  ))
+    )
+  )
+;; tide-project-root is referenced constantly by tide.
+;; If you call locate-dominating-file in tide-project-root,
+;; emacs freezes constantly doing a bunch of directory
+;; traversals.  Here we'll cache results in a hashtable.
+(setq dominating-file-cache (make-hash-table :test 'equal))
+(defun caching-locate-dominating-file (dir file)
+  (if (not (equal file ".git"))
+      (locate-dominating-file dir file)
+    (let ((cached (gethash dir dominating-file-cache)))
+      (if (not (equal nil cached))
+          (progn
+            ;; (message "got cached")
+            cached)
+        (let ((result (locate-dominating-file dir file)))
+          (progn
+            ;; (message "cache miss, looked up result")
+            (puthash dir result dominating-file-cache)
+            result))))))
 (defun tide-project-root ()
-  (locate-dominating-file default-directory ".git"))
+  "Looks up project root using caching-locate-dominate-file"
+  (progn
+    (caching-locate-dominating-file default-directory ".git"))
+  )
 (defun my-tide-tsserver-locator ()
   "Locate the nearest relevant tsserver."
   (or
@@ -780,10 +800,13 @@ Major Mode for editing ML-Yacc files." t nil)
      (css-indent-offset . 2)))
  '(scroll-bar-mode 'right)
  '(show-trailing-whitespace t)
+ '(tide-disable-suggestions t)
  '(tide-node-executable "/Users/keunwoo/bin/node-activated")
- '(tide-sync-request-timeout 5)
+ '(tide-server-max-response-length 204800)
+ '(tide-sync-request-timeout 10)
+ '(tide-tsserver-flags
+   '("--useInferredProjectPerProjectRoot" "--disableAutomaticTypingAcquisition" "--noGetErrOnBackgroundUpdate" "--canUseWatchEvents"))
  '(tide-tsserver-locator-function 'my-tide-tsserver-locator)
- '(tide-tsserver-process-environment '("NODE_OPTIONS='--max_old_space_size=8000'"))
  '(tool-bar-mode nil)
  '(vc-follow-symlinks nil)
  '(visible-bell t)
