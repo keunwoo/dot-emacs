@@ -791,7 +791,7 @@ Major Mode for editing ML-Yacc files." t nil)
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(treesit-auto string-inflection lsp-mode json-reformat adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js rust-mode swift-mode tide urlenc use-package web-mode))
+   '(lsp-ui lsp-mode treesit-auto string-inflection json-reformat adaptive-wrap column-enforce-mode company flycheck-flow git-commit go-mode helm-ls-git js2-mode json-mode jsx-mode magit markdown-mode prettier-js swift-mode urlenc use-package web-mode))
  '(prettier-js-command "/Users/keunwoo/h/keunwoo/bin/run-prettier")
  '(ps-print-header-frame nil)
  '(safe-local-variable-values
